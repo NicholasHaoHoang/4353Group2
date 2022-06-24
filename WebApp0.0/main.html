@@ -13,7 +13,7 @@
     <body>
         <!--TODO: Create a Login System-->
         <!--Post form-->
-        <form method="POST" action=""><!--TODO: Add the backend form for retrieval of account from user and pass-->
+        <form method="POST" action="" id="Login"><!--TODO: Add the backend form for retrieval of account from user and pass-->
             <p>Login:</p> <!--Login caption-->
             <p>
                 <!--Username Field-->
@@ -23,14 +23,14 @@
             <p>
                 <!--Password field-->
                 <label for = "pass_word">Password:</label>
-                <input type="text" name="Password" id = "pass_word" placeholder="********">
+                <input type="password" name="Password" id = "pass_word" placeholder="Password">
             </p>
             <!--Submit button-->
             <input type="submit">
          </form>
 
         <!--TODO: Create a Registration System-->
-        <form method="POST" action=""><!--TODO: Add the backend form for creation of account-->
+        <form method="POST" action="" id="Register"><!--TODO: Add the backend form for creation of account-->
             <p>Register:</p> <!--Register caption-->
             <p>
                 <!--Username Field-->
@@ -40,7 +40,7 @@
             <p>
                 <!--Password field-->
                 <label for = "pass_word">Create a password:</label>
-                <input type="text" name="Password" id = "pass_word" placeholder="********">
+                <input type="password" name="Password" id = "pass_word" placeholder="Password">
             </p>
             <!--Submit button-->
             <input type="submit">
@@ -53,7 +53,7 @@
                     -City(100 char, required)
                     -State(Drop Down, selection required; 2 char state code)
                     -Zipcode(9 char, at least 5 char code required)-->
-        <form method="POST" action=""><!--TODO: Add the backend form for Update of account-->
+        <form method="POST" action="" id ="profilemanagement" onsubmit="return ValidateForm()"><!--TODO: Add the backend form for Update of account-->
             <p>Profile Management</p> <!--caption-->
             <p>
                 <!--Full Name Field-->
@@ -138,7 +138,7 @@
             <p>
                 <!--Zip Code field-->
                 <label for = "zipcode">Zipcode</label>
-                <p><input minlength="5" maxlength="9" type="number" name="zipcode" id = "zipcode" placeholder="Zipcode (5-9 digits)" required="required"></p>
+                <p><input pattern = "[0-9]*" minlength="5" maxlength="9" type="text" name="zipcode" id = "zipcode" placeholder="Zipcode (5-9 digits)" required="required"></p>
             </p> 
             <!--Submit button-->
             <input type="submit">
@@ -150,6 +150,39 @@
                     -Delivery Date (Calendar, date picker)
                     -Suggested Price/Gallon (numeric non-editable, comes from pricing module)
                     -Total Amount Due(numeric non-editable, calculated by (gallons*price) )-->
+        <form method="POST" action="" id = "fuelquote"><!--TODO: Add the backend form for creation of fuel quote form-->
+            <p>Fuel Quote Form:</p> <!--caption-->
+            <p>
+                <!--Gallons Requested Field-->
+                <label for = "gallonsreq">Gallons Requested: </label>
+                <input type="number" name="gallonsreq" id = "gallonsreq" placeholder="Amount of gallons:" Required>
+            </p>
+            <p>
+                <!--Delivery Address field-->
+                <label for = "deliveryaddress">Delivery Address: </label>
+                <!--TODO: Add functionality to pull address from profile database-->
+                <input type="text"  name="deliveryaddress" value = "" id = "deliveryaddress" Required > 
+            </p>
+            <p>
+                <!--Delivery Date-->
+                <label for = "deliverydate">Select a Delivery Date: </label>
+                <input type="date" name="deliverydate" id = "deliverydate" Required>
+            </p>
+            <p>
+                <!--Suggested Price/Gallon-->
+                <label for = "pricepergallon">Suggested Price/Gallon: </label>
+                <!--TODO: Add functionality to pull price per gallon from Module-->
+                <input type="number" name="pricepergallon" id = "pricepergallon" placeholder="Price/Gallon">
+            </p>
+            <p>
+                <!--Total Amount Due field-->
+                <label for = "totalamount">Total Amount Due: </label>
+                <input type="number" name="totalamount" id = "totalamount" >
+            </p>
+            <!--Submit button-->
+            <input type="submit">
+            </form>    
+
 
         <!--TODO: Create Fuel Quote History form
                     -Same Fields as Fuel Quote Form
