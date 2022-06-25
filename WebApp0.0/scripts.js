@@ -1,6 +1,3 @@
-/*
-*/
-
 let profileForm = document.querySelector("#profilemanagement");
 let zipcodeValid = false;
 let zipcodeWidget = document.querySelector("#zipcode");
