@@ -17,7 +17,6 @@ function checkZipcode() {
 }
 
 
-
 //checks if there are any errors in the Profile Management form.
 function checkForm(event) {
     if (!zipcodeValid) {
