@@ -48,7 +48,8 @@
                 <div class="card">
                     <div class="card-header">Profile Management Form</div>
                     <div class="card-body">
-                        <form action="#" method="Post">
+                        <form action="signup" method="POST">
+                            {% csrf_token %}
 							<div class="form-group row">
                                 <label for="Firstname" class="col-md-4 col-form-label text-md-right">Full Name</label>
                                 <div class="col-md-6">
