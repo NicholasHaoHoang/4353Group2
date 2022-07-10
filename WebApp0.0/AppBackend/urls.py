@@ -10,6 +10,6 @@ urlpatterns = [
     path('login.html', views.login, name='login'),
     path('Signup.html', views.signup, name='signup'),
     path('ProfileManagement.html', views.ProfileManagement, name='ProfileManagement'),
-    path('confirmQuote',views.confirmQuote, name="confirmQuote")
+    path('confirmQuote',views.confirmQuote, name="confirmQuote"),
     path('logout',views.logout, name='logout')
 ]
