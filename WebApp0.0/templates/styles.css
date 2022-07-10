@@ -10,7 +10,10 @@ body{
     text-align: left;
     background-color: #f5f8fa;
 }
-
+w5{
+    color: red;
+    text-align: center;
+}
 .navbar-laravel
 {
     box-shadow: 0 2px 4px rgba(0,0,0,.04);
