@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 <<<<<<< HEAD
+<<<<<<< HEAD
 import datetime
 import time
 from random import randint
 =======
+=======
+>>>>>>> 20f4ae7308b8591b45fe1f349d6e126f42be15aa
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.shortcuts import redirect
