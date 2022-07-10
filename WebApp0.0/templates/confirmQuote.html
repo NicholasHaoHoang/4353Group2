@@ -13,8 +13,7 @@
 
     </head>    
     
- <body> 
-
+    <body>
 <nav class="navbar navbar-expand-lg navbar-light navbar-laravel">
     <div class="container">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,13 +23,13 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto">
 				<li class="nav-item">
-                    <a class="nav-link " href="index.html" >Profile</a>
+                    <a class="nav-link " href="main.html" >Profile</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="FuelQuote.html" >Fuel Quote</a>
+                    <a class="nav-link active" href="#" >Fuel Quote</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Fuel History</a>
+                    <a class="nav-link " href="FuelHistory.html">Fuel History</a>
                 </li>
 				
                 <li class="nav-item">
@@ -42,46 +41,23 @@
     </div>
 </nav>
 
-<main class="login-form">
+<main class="Order-form">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-12">
+            <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">Fuel Quote Form</div>
-    <div class="row col-md-12 col-md-offset-12 custyle">
-    <table class="table table-striped custab">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Gallons Requested </th>
-            <th>Delivery Address</th>
-			<th>Delivery Date</th>
-            <th>Suggested Price / gallon</th>
-            <th>Total Amount Due</th>
+                    <div class="card-body">
+                       <H1>
+                           {% block content %}
+                           Your quote is successfully placed. Your quote number is {{quoteNo}}
+                           {% endblock %}
+                       </H1>
 
-            <!-- <th class="text-center">Action</th> -->
-        </tr>
-    </thead>
-        {% for datarow in data %}
-
-            <tr>
-                <td>{{datarow.Name}}</td>
-                <td>{{datarow.GallonsRequested}}</td>
-                <td>{{datarow.DeliveryAddress}}</td>
-				<td>{{datarow.DeliveryDate}}</td>
-                <td>{{datarow.SuggestedPrice}}</td>
-				<td>{{datarow.AmountDue}}</td>
-
-
-                <!-- <td class="text-center"><a class='btn btn-info btn-xs' href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a> <a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Del</a></td> -->
-            </tr>
-            {% endfor %}
-           
-    </table>
-    </div>
-</div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
     </div>
 
 </main>
