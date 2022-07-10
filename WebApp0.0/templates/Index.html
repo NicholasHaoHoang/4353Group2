@@ -13,7 +13,6 @@
 
     </head>
  <body>
-
 <nav class="navbar navbar-expand-lg navbar-light navbar-laravel">
     <div class="container">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,10 +30,15 @@
                 <li class="nav-item">
                     <a class="nav-link " href="FuelHistory.html">Fuel History</a>
                 </li>
-				
+				{% if user.is_authenticated%}
                 <li class="nav-item">
-                    <a class="nav-link " href="main.html">Logout</a>
+                    <a class="nav-link " href="logout">Logout</a>
                 </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link " href="login.html">Login</a>
+                </li>
+                {% endif %}
             </ul>
 
         </div>
@@ -46,6 +50,11 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
+                    {% if user.is_authenticated %}
+                    <h1>Welcome, {{user.username}}</h1>
+                    {% else %}
+                    <h1>Hello, Anonymous User</h1>
+                    {% endif %}
                     <div class="card-header">Profile Management Form</div>
                     <div class="card-body">
                         <form action="signup" method="POST">
