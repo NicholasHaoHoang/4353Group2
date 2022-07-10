@@ -1,8 +1,16 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+<<<<<<< HEAD
 import datetime
 import time
 from random import randint
+=======
+from django.contrib.auth.models import User, auth
+from django.contrib import messages
+from django.shortcuts import redirect
+from .models import Feature
+
+>>>>>>> 20f4ae7308b8591b45fe1f349d6e126f42be15aa
 # Create your views here.
 
 #Rendering Index.html
@@ -54,10 +62,7 @@ def  fuelQuote(request):
 
     return render(request, 'FuelQuote.html',{'DeliveryAddress':'XYZ Address','Price':500,'Amount':5000})
 
-#Rendering main.html
-def  main(request):
-    #Insert code for login (main.html) here
-
+#Rendering login.html
     #END CODE
 
     return render(request, 'main.html')
