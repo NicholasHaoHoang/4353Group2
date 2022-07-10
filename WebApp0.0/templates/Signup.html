@@ -23,7 +23,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="main.html">Login</a>
+                    <a class="nav-link" href="login.html">Login</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active" href="#">Register</a>
@@ -33,7 +33,9 @@
         </div>
     </div>
 </nav>
-
+{% for message in messages %}
+<h1>{{message}}</h1>
+{% endfor %}
 <main class="login-form">
     <div class="cotainer">
         <div class="row justify-content-center">
@@ -41,24 +43,25 @@
                 <div class="card">
                     <div class="card-header">Register</div>
                     <div class="card-body">
-                        <form action="main.html" method="Post">
+                        <form action="Signup.html" method="POST">
+                            {% csrf_token %}
 							<div class="form-group row">
-                                <label for="email_address" class="col-md-4 col-form-label text-md-right">Name</label>
+                                <label for="name" class="col-md-4 col-form-label text-md-right">Name</label>
                                 <div class="col-md-6">
-                                    <input type="text" id="email_address" class="form-control" name="email-address" required autofocus>
+                                    <input type="text" id="name" class="form-control" name="name" required autofocus>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="email_address" class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
                                 <div class="col-md-6">
-                                    <input type="text" id="email_address" class="form-control" name="email-address" required autofocus>
+                                    <input type="text" id="email_address" class="form-control" name="email_address" required autofocus>
                                 </div>
                             </div>
 
 							<div class="form-group row">
-                                <label for="email_address" class="col-md-4 col-form-label text-md-right">Confirm E-Mail Address</label>
+                                <label for="confirm_email_address" class="col-md-4 col-form-label text-md-right">Confirm E-Mail Address</label>
                                 <div class="col-md-6">
-                                    <input type="text" id="email_address" class="form-control" name="email-address" required autofocus>
+                                    <input type="text" id="confirm_email_address" class="form-control" name="confirm_email_address" required autofocus>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -70,7 +73,7 @@
                             <div class="form-group row">
                                 <label for="password" class="col-md-4 col-form-label text-md-right">Confirm Password</label>
                                 <div class="col-md-6">
-                                    <input type="password" id="password" class="form-control" name="password" required>
+                                    <input type="password" id="confirm_password" class="form-control" name="confirm_password" required>
                                 </div>
                             </div>
 
