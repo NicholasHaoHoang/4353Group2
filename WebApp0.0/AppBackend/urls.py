@@ -5,7 +5,11 @@ from . import views
 urlpatterns = [
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     path('', views.main, name='index'),
+=======
+    path('', views.index, name='index'),\
+>>>>>>> 20f4ae7308b8591b45fe1f349d6e126f42be15aa
 =======
     path('', views.index, name='index'),\
 >>>>>>> 20f4ae7308b8591b45fe1f349d6e126f42be15aa
@@ -19,7 +23,11 @@ urlpatterns = [
     path('ProfileManagement.html', views.ProfileManagement, name='ProfileManagement'),
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     path('confirmQuote',views.confirmQuote, name="confirmQuote")
+=======
+    path('logout',views.logout, name='logout')
+>>>>>>> 20f4ae7308b8591b45fe1f349d6e126f42be15aa
 =======
     path('logout',views.logout, name='logout')
 >>>>>>> 20f4ae7308b8591b45fe1f349d6e126f42be15aa
