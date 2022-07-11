@@ -41,6 +41,14 @@
     </div>
 </nav>
 <!--Add Functionality to pull current user's Profile Info from database in Assignment 4-->
+{% if user.is_authenticated%}
+    <h1>Current Profile Information</h1>
+    <h2>Name : {{name}}</h2>
+    <h2>Address: {{address1}} {{address2}}</h2>
+    <h2>State: {{state}}</h2>
+    <h2>City: {{city}}</h2>
+    <h2>Zipcode: {{zipcode}}</h2>
+{% endif %}
 <main class="login-form">
     <div class="container">
         <div class="row justify-content-center">
