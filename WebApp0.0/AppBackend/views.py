@@ -117,24 +117,39 @@ def  signup(request):
 #Rendering ProfileManagement.html
 def  ProfileManagement(request):
     #Insert code for Profile Management here
+    #current user, use in Assignment 4 to pull info
     current_user = request.user
+    #prof  = Profile of current user
+    prof = {
+        'name' : 'Nick',
+        'address1' : 'home street',
+        'address2' : '',
+        'state' : 'TX',
+        'city' : 'Houston',
+        'zipcode' : '77444'
+    }
     if request.user.is_authenticated:
         if request.method == 'POST':
+            #Pull from Database, Implement this part in Assignment 4
+            """
             name = request.POST.get('firstname')
             address1 = request.POST.get('address1')
             address2 = request.POST.get('address2')
             state = request.POST.get('state')
             city = request.POST.get('city')
             zipcode = request.POST.get('zipcode')
+            
             prof = Profile.objects.create(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
             prof.save()
-            return redirect('ProfileManagement.html')
-        #END CODE
+            """
+            
+            return render(request,'ProfileManagement.html',prof)
         else:
-            return render(request, 'ProfileManagement.html')
+            return render(request,'ProfileManagement.html',prof)
     else:
         messages.info(request, 'Please Login to manage your profile');
         return redirect('login.html')
+    #END CODE
         
 
 
