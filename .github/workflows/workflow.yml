@@ -18,7 +18,7 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         directory: ./coverage/reports/
-        root_dir: ./WebApp0.0/
+        root_dir: ./WebApp0.0/Assignment3/
         fail_ci_if_error: true
         files: ./coverage1.xml,./coverage2.xml
         flags: unittests
