@@ -168,3 +168,59 @@ def confirmQuote(request):
     quoteNo =rand+timeNow
 
     return render(request, "confirmQuote.html",{'quoteNo':quoteNo})
+
+#PricingModule Class
+class PricingModule:
+    def __init__(self, galls_req):
+        self.current_price = 1.50
+        self.gallonsReq = gallonsReq
+        self.user = Profile.objects.latest('id') 
+
+    def states_factor(self):
+        if self.user.state == 'TX':
+            return 0.02
+        else:
+            return 0.04
+
+    def rate_history(self):
+        all_entries = fuelQuote.objects.all()
+        if not all_entries:
+            historyExist = False
+        else:
+            historyExist = True
+
+        if historyExist:
+            return 0.01 
+        else:
+            return 0.0
+
+    def gallonsReq_factor(self):
+        if int(self.gallonsReq) > 1000:
+            return 0.03
+        else:
+            return 0.04
+
+    def margin(self):
+        location_factor = self.states_factor()
+        rate_history = self.rate_history()
+        gallonsReq_factor = self.gallonsReq_factor()
+
+        company_profit = .20
+
+        margin = round((self.current_price * (location_factor - rate_history + gallonsReq_factor + company_profit)),3)
+
+        print("location_factor", location_factor)
+        print("ratehistory_factor", rate_history)
+        print("gallonsReq_factor", gallonsReq_factor)
+
+        rounded_margin = round(margin, 3)
+        print("margin", margin)
+        print("rounded margin", rounded_margin)
+
+        return rounded_margin
+    
+    def calculate(self):
+        
+        result = (self.margin() + self.current_price) * self.gallonsReq
+        print("result", result)
+        return result
