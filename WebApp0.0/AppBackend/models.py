@@ -8,8 +8,9 @@ class Feature(models.Model):
 
 class Profile(models.Model):
     name = models.CharField(max_length = 50)
+    email = models.CharField(max_length=100,blank = True)
     address1 = models.CharField(max_length = 100)
-    address2 = models.CharField(max_length = 100)
+    address2 = models.CharField(max_length = 100, blank=True, default='')
     city = models.CharField(max_length=50)
     state = models.CharField(max_length = 2)
     zipcode = models.CharField(max_length = 9)
