@@ -154,52 +154,55 @@ def  ProfileManagement(request):
 
 
 def confirmQuote(request):
-    gallonsReq=request.GET['gallonsReq']
-    deliveryAddress=request.GET['deliveryAddress']
-    deliverydate=request.GET['deliverydate']
-    price=request.GET['price']
-    AmountDue=request.GET['AmountDue']
-    if int(request.GET['gallonsReq'])<1 or request.GET['gallonsReq'].isdigit()==False:
-        return render(request, "FuelQuote.html",{"gallonsReq":gallonsReq,"message":"Gallons requested must be a number"})
-    else:
-        gallonsReq=int(request.GET['gallonsReq'])
+    if request.method == "GET":
+        gallonsReq=request.GET.get('gallonsReq')
+        deliveryAddress=request.GET.get('deliveryAddress')
+        deliverydate=request.GET.get('deliverydate')
+        price=request.GET.get('price')
+        AmountDue=request.GET.get('AmountDue')
+        if int(request.GET.get('gallonsReq'))<1 or request.GET.get('gallonsReq').isdigit()==False:
+            return render(request, "FuelQuote.html",{"gallonsReq":gallonsReq,"message":"Gallons requested must be a number"})
+        else:
+            gallonsReq=int(request.GET['gallonsReq'])
+            
+        if int(request.GET['price'])<1 or request.GET['price'].isdigit()==False:
+            return render(request, "FuelQuote.html",{"price":gallonsReq,"message":"Price must be a number"})
+        else:
+            price=int(request.GET['price'])
         
-    if int(request.GET['price'])<1 or request.GET['price'].isdigit()==False:
-        return render(request, "FuelQuote.html",{"price":gallonsReq,"message":"Price must be a number"})
-    else:
-        price=int(request.GET['price'])
-    
-    if request.GET['AmountDue'].isdigit()==False:
-        return render(request, "FuelQuote.html",{"AmountDue":gallonsReq,"message":"Amount Due must be a number"})
-    else:
-        AmountDue=int(request.GET['AmountDue'])
-    if request.GET['AmountDue'].isdigit()==False:
-        return render(request, "FuelQuote.html",{"AmountDue":gallonsReq,"message":"Amount Due must be a number"})
-    else:
-        AmountDue=int(request.GET['AmountDue'])
+        if request.GET['AmountDue'].isdigit()==False:
+            return render(request, "FuelQuote.html",{"AmountDue":gallonsReq,"message":"Amount Due must be a number"})
+        else:
+            AmountDue=int(request.GET['AmountDue'])
+        if request.GET['AmountDue'].isdigit()==False:
+            return render(request, "FuelQuote.html",{"AmountDue":gallonsReq,"message":"Amount Due must be a number"})
+        else:
+            AmountDue=int(request.GET['AmountDue'])
 
-    month,day,year=deliverydate.split('-')
-    isValid=True
-    try:
-        datetime.datetime(int(month),int(day),int(year))
+        month,day,year=deliverydate.split('-')
+        isValid=True
+        try:
+            datetime.datetime(int(month),int(day),int(year))
 
-    except ValueError:
-        isValid=False
-    if isValid==False:
-        return render(request, "FuelQuote.html",{"deliverydate":gallonsReq,"message":"Delivery date is not in correct format"})
+        except ValueError:
+            isValid=False
+        if isValid==False:
+            return render(request, "FuelQuote.html",{"deliverydate":gallonsReq,"message":"Delivery date is not in correct format"})
+            
         
-    
-    print(gallonsReq)
-    print(deliveryAddress)
-    print(deliverydate)
-    print(price)
-    print(AmountDue)
+        print(gallonsReq)
+        print(deliveryAddress)
+        print(deliverydate)
+        print(price)
+        print(AmountDue)
 
-    rand = randint(0,1000)
-    timeNow = round(time.time()*1000)
-    quoteNo =rand+timeNow
+        rand = randint(0,1000)
+        timeNow = round(time.time()*1000)
+        quoteNo =rand+timeNow
 
-    return render(request, "confirmQuote.html",{'quoteNo':quoteNo})
+        return render(request, "confirmQuote.html",{'quoteNo':quoteNo})
+    else:
+        return render(request,"FuelQuote.html")
 
 #PricingModule Class
 class PricingModule:
