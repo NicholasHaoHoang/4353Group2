@@ -82,7 +82,7 @@ def logout(request):
     auth.logout(request)
     return redirect('/')
 #Rendering Signup.html
-def  signup(request):
+def signup(request):
     #Insert code for Sign up here
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -103,7 +103,7 @@ def  signup(request):
                 user.save()
                 return redirect('login.html')
         else:
-            if not(confirmpassword ==password):
+            if not(confirmpassword == password):
                 messages.info(request, 'Passwords do not match')
             else:
                 messages.info(request, 'Email Addresses do not match')

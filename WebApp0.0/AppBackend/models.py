@@ -14,3 +14,4 @@ class Profile(models.Model):
     city = models.CharField(max_length=50)
     state = models.CharField(max_length = 2)
     zipcode = models.CharField(max_length = 9)
+
