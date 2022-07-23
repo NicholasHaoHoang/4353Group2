@@ -13,7 +13,8 @@
 
     </head>    
     
-    <body>
+ <body> 
+
 <nav class="navbar navbar-expand-lg navbar-light navbar-laravel">
     <div class="container">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,17 +24,17 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto">
 				<li class="nav-item">
-                    <a class="nav-link " href="main.html" >Profile</a>
+                    <a class="nav-link " href="ProfileManagement.html" >Profile</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#" >Fuel Quote</a>
+                    <a class="nav-link " href="FuelQuote.html" >Fuel Quote</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="FuelHistory.html">Fuel History</a>
+                    <a class="nav-link active" href="#">Fuel History</a>
                 </li>
 				
                 <li class="nav-item">
-                    <a class="nav-link " href="main.html">Logout</a>
+                    <a class="nav-link " href="logout">Logout</a>
                 </li>
             </ul>
 
@@ -41,23 +42,48 @@
     </div>
 </nav>
 
-<main class="Order-form">
+<main class="login-form">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">Fuel Quote Form</div>
-                    <div class="card-body">
-                       <H1>
-                           {% block content %}
-                           Your quote is successfully placed. Your quote number is {{quoteNo}}
-                           {% endblock %}
-                       </H1>
+    <div class="row col-md-12 col-md-offset-12 custyle">
+    <table class="table table-striped custab">
+    <thead>
+        <tr>
+            <th>Quote ID</th>
+            <th>Email</th>
+            <th>Gallons Requested </th>
+            <th>Delivery Address</th>
+			<th>Delivery Date</th>
+            <th>Suggested Price / gallon</th>
+            <th>Total Amount Due</th>
 
-                    </div>
-                </div>
-            </div>
+            <!-- <th class="text-center">Action</th> -->
+        </tr>
+    </thead>
+        {% for datarow in data %}
+
+            <tr>
+                <td>{{datarow.quoteId}}</td>
+                <td>{{datarow.email}}</td>
+                <td>{{datarow.gallonsRequested}}</td>
+                <td>{{datarow.deliveryAddress}}</td>
+				<td>{{datarow.deliverydate}}</td>
+                <td>{{datarow.price}}</td>
+				<td>{{datarow.AmountDue}}</td>
+
+
+                <!-- <td class="text-center"><a class='btn btn-info btn-xs' href="#"><span class="glyphicon glyphicon-edit"></span> Edit</a> <a href="#" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Del</a></td> -->
+            </tr>
+            {% endfor %}
+           
+    </table>
+    </div>
+</div>
         </div>
+    </div>
     </div>
 
 </main>

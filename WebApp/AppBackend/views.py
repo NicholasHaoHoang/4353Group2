@@ -6,7 +6,7 @@ from random import randint
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.shortcuts import redirect
-from .models import Feature, Profile
+from AppBackend.models import Feature, Profile, FuelQuote
 # Create your views here.
 
 #Rendering Index.html
@@ -15,10 +15,13 @@ def index(request):
 
     #END CODE
 
-    return render(request, 'Index.html')
+    return render(request, 'login.html')
 
 #Rendering FuelHistory.html
 def  fuelHistory(request):
+    if request.user.is_authenticated == False or request.user.is_superuser :
+        print("logout")
+        return render(request, 'login.html')
     #Insert code for Fuel History Here
     data = [
         {
@@ -46,6 +49,8 @@ def  fuelHistory(request):
         'AmountDue': '50'
         }
     ]
+
+    data = FuelQuote.objects.all()
     #END CODE
 
     return render(request, 'FuelHistory.html',{'data':data})
@@ -53,10 +58,16 @@ def  fuelHistory(request):
 #Rendering FuelQuote.html
 def  fuelQuote(request):
     #Insert code for Fuel Quote here
+    print(request.user)
 
+    if request.user.is_authenticated == False or request.user.is_superuser :
+        return render(request, 'login.html')
     #END CODE
-
-    return render(request, 'FuelQuote.html',{'DeliveryAddress':'XYZ Address','Price':500,'Amount':5000})
+    profile = Profile.objects.filter(email=request.user)
+    print(profile[0].email)
+    # profile = Profile(email=request.user)
+    print(profile[0].address1)
+    return render(request, 'FuelQuote.html',{'DeliveryAddress':profile[0].address1 + ' '+ profile[0].address2,'Price':500,'Amount':0})
 
 #Rendering login.html
 def  login(request):
@@ -69,7 +80,7 @@ def  login(request):
 
         if user is not None:
             auth.login(request, user)
-            return redirect('/')
+            return redirect('/ProfileManagement.html')
         else:
             messages.info(request, 'Credentials invalid')
             return redirect('login.html')
@@ -79,7 +90,12 @@ def  login(request):
 
 #Logout Function
 def logout(request):
+    request.session.flush()
+    print(request.user)
+
+    
     auth.logout(request)
+    print(request.user)
     return redirect('/')
 #Rendering Signup.html
 def signup(request):
@@ -116,7 +132,10 @@ def signup(request):
 
 #Rendering ProfileManagement.html
 def  ProfileManagement(request):
-    #Insert code for Profile Management here
+    if request.user.is_authenticated == False or request.user.is_superuser :
+        print("logout")
+        return render(request, '/')
+        #Insert code for Profile Management here
     #current user, use in Assignment 4 to pull info
     current_user = request.user
     #prof  = Profile of current user
@@ -196,11 +215,21 @@ def confirmQuote(request):
         print(price)
         print(AmountDue)
 
-        rand = randint(0,1000)
-        timeNow = round(time.time()*1000)
-        quoteNo =rand+timeNow
 
-        return render(request, "confirmQuote.html",{'quoteNo':quoteNo})
+
+        res = FuelQuote.objects.create(
+            email = request.user,
+            gallonsRequested = gallonsReq,
+            deliveryAddress = deliveryAddress,
+            deliverydate =deliverydate,
+            price =price,
+            AmountDue =AmountDue
+        )
+        # rand = randint(0,1000)
+        # timeNow = round(time.time()*1000)
+        # quoteNo =rand+timeNow
+        
+        return render(request, "confirmQuote.html",{'quoteNo':res.quoteId})
     else:
         return render(request,"FuelQuote.html")
 

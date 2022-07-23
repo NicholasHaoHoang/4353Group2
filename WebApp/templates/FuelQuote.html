@@ -10,6 +10,7 @@
         <link href="/styles.css"> <!--Connect styles.css-->
     <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,600" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
     </head>    
     
@@ -33,7 +34,7 @@
                 </li>
 				
                 <li class="nav-item">
-                    <a class="nav-link " href="login.html">Logout</a>
+                    <a class="nav-link " href="logout">Logout</a>
                 </li>
             </ul>
 
@@ -53,7 +54,7 @@
 							<div class="form-group row">
                                 <label for="Firstname" class="col-md-4 col-form-label text-md-right">Gallons Requested</label>
                                 <div class="col-md-6">
-                                    <input type="number" id="firstname" class="form-control" placeholder="numbers only, required" name="gallonsReq" required autofocus>
+                                    <input type="number" id="gallonsReq" class="form-control" placeholder="numbers only, required" name="gallonsReq" required autofocus>
                                 </div>
                             </div>
 							
@@ -109,6 +110,28 @@
 
 
 </body>
+
+
+<script>
+
+    $(document).ready(
+      function() {
+        event.preventDefault();
+        $('#gallonsReq').on('input',
+          function(e) {
+            console.log("changing")
+            $('#AmountDue').val(
+                parseFloat($(this).val()) * parseFloat($('#price').val()) 
+             
+            );
+          }
+        );
+    
+      }
+    );
+    </script>
 </html>
+
+
 
 
