@@ -15,14 +15,6 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - name: Install dependencies
-      run: npm install
-
     - name: Run tests
       run: coverage run ./WebApp/manage.py test AppBackend -v 3 --force-color
 
