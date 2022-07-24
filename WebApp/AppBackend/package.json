@@ -1,15 +1,15 @@
 {
-    "name": "app-backend",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "jest --coverage"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "devDependencies": {
-        "jest": "^28.1.3"
-    }
+  "name": "appbackend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "test": "coverage run manage.py test AppBackend -v 3 --force-color"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^28.1.3"
+  }
 }
