@@ -18,6 +18,7 @@ jobs:
 
     - name: Install dependencies
       run: pip install coverage
+      run: pip install django
 
     - name: Run tests
       run: coverage run ./WebApp/manage.py test AppBackend -v 3 --force-color
