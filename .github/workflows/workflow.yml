@@ -15,6 +15,10 @@ jobs:
       with:
         fetch-depth: 2
 
+
+    - name: Install dependencies
+      run: pip install coverage
+
     - name: Run tests
       run: coverage run ./WebApp/manage.py test AppBackend -v 3 --force-color
 
