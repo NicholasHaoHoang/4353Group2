@@ -10,10 +10,13 @@ jobs:
     
 
     steps:
+    - uses: checkout@master
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
         fetch-depth: 2
+    - name: Setup Python
+      uses: actions/setup-python@master
 
 
     - name: Install dependencies
@@ -24,8 +27,7 @@ jobs:
       run: coverage run ./WebApp/manage.py test AppBackend -v 3 --force-color
 
     - name: Upload coverage to Codecov
-      uses: actions/checkout@master
-            codecov/codecov-action@v3
+      uses: codecov/codecov-action@v3
       with:
         directory: ./WebApp/
         files: ./coverage.xml
