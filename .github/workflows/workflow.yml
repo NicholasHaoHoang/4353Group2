@@ -27,7 +27,9 @@ jobs:
         pip install django
 
     - name: Run tests
-      run: coverage run ./WebApp/manage.py test AppBackend -v 3 --force-color
+      run: |
+        coverage run ./WebApp/manage.py test AppBackend -v 3 --force-color
+        coverage xml
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
