@@ -22,35 +22,36 @@ def  fuelHistory(request):
     if request.user.is_authenticated == False or request.user.is_superuser :
         print("logout")
         return render(request, 'login.html')
-    #Insert code for Fuel History Here
-    data = [
-        {
-        'Name': 'Younus',
-        'GallonsRequested': '100',
-        'DeliveryAddress': 'ABCD address',
-        'DeliveryDate': '10-20-2022',
-        'SuggestedPrice': '1000',
-        'AmountDue': '10'
-        },
-        {
-        'Name': 'Nick',
-        'GallonsRequested': '200',
-        'DeliveryAddress': 'XYZ address',
-        'DeliveryDate': '11-21-2022',
-        'SuggestedPrice': '200',
-        'AmountDue': '02'
-        },
-        {
-        'Name': 'Leena',
-        'GallonsRequested': '400',
-        'DeliveryAddress': 'DEF address',
-        'DeliveryDate': '11-21-2012',
-        'SuggestedPrice': '20',
-        'AmountDue': '50'
-        }
-    ]
+    else:
+        #Insert code for Fuel History Here
+        data = [
+            {
+            'Name': 'Younus',
+            'GallonsRequested': '100',
+            'DeliveryAddress': 'ABCD address',
+            'DeliveryDate': '10-20-2022',
+            'SuggestedPrice': '1000',
+            'AmountDue': '10'
+            },
+            {
+            'Name': 'Nick',
+            'GallonsRequested': '200',
+            'DeliveryAddress': 'XYZ address',
+            'DeliveryDate': '11-21-2022',
+            'SuggestedPrice': '200',
+            'AmountDue': '02'
+            },
+            {
+            'Name': 'Leena',
+            'GallonsRequested': '400',
+            'DeliveryAddress': 'DEF address',
+            'DeliveryDate': '11-21-2012',
+            'SuggestedPrice': '20',
+            'AmountDue': '50'
+            }
+        ]
 
-    data = FuelQuote.objects.all()
+        data = FuelQuote.objects.all()
     #END CODE
 
     return render(request, 'FuelHistory.html',{'data':data})
@@ -235,10 +236,10 @@ def confirmQuote(request):
 
 #PricingModule Class
 class PricingModule:
-    def __init__(self, galls_req):
+    def __init__(self, user, galls_req):
         self.current_price = 1.50
         self.gallonsReq = galls_req
-        self.user = Profile.objects.latest('id') 
+        self.user = user
 
     def states_factor(self):
         if self.user.state == 'TX':
@@ -247,7 +248,7 @@ class PricingModule:
             return 0.04
 
     def rate_history(self):
-        all_entries = fuelQuote.objects.all()
+        all_entries = FuelQuote.objects.all()
         if not all_entries:
             historyExist = False
         else:

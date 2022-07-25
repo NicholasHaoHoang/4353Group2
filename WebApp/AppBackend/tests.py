@@ -1,10 +1,19 @@
-from django.test import TestCase
+from django.test import TestCase, Client
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import CreateView
+from django.contrib.auth.models import User
+from django.contrib.auth import get_user
+from django.urls import reverse, resolve
+import json
 from .models import Profile, Feature, FuelQuote
+from .views import *
 
 # Create your tests here.
 class ModelTest(TestCase):
     def create_profile(self):
         prof = Profile()
+        prof.id = "-1"
         prof.name = "Test A"
         prof.email = "test@gmail.com"
         prof.address1 = "0 test street"
@@ -16,14 +25,14 @@ class ModelTest(TestCase):
     def test_profile_creation(self):
         w = self.create_profile()
         self.assertTrue(isinstance(w, Profile))
-    #--------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
     def create_Feature(self, name = "TestName", details = "This is test details"):
         return Feature.objects.create(name = name, details=details)
 
     def test_feature_creation(self):
         w = self.create_Feature()
         self.assertTrue(isinstance(w, Feature))
-    #--------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
     def create_FuelQuote(self, email="test@email.com", gallonsRequested= "0", deliveryAddress="0 street", deliverydate = "1/1/2000", price="0", AmountDue="0"):
         return FuelQuote.objects.create(email=email,gallonsRequested=gallonsRequested, deliveryAddress=deliveryAddress,deliverydate=deliverydate, price=price,AmountDue=AmountDue)
     def test_FuelQuote_creation(self):
@@ -35,30 +44,121 @@ class ModelTest(TestCase):
 
 class URLTests(TestCase):
     def test_testIndex(self):
-        response = self.client.get('/')
-        self.assertEqual(response.status_code,200)
+        url = reverse('index')
+        self.assertEqual(resolve(url).func, index)
 
     def test_testFuelQuote(self):
-        response = self.client.get('/FuelQuote.html')
-        self.assertEqual(response.status_code,200)
+        url = reverse('fuelQuote')
+        self.assertEqual(resolve(url).func, fuelQuote)
 
     def test_FuelHistory(self):
-        response = self.client.get('/FuelHistory.html')
-        self.assertEqual(response.status_code,200)
+        url = reverse('fuelHistory')
+        self.assertEqual(resolve(url).func, fuelHistory)
 
     def test_testLogin(self):
-        response = self.client.get('/login.html')
-        self.assertEqual(response.status_code,200)
+        url = reverse('login')
+        self.assertEqual(resolve(url).func, login)
 
     def test_testSignup(self):
-        response = self.client.get('/Signup.html')
-        self.assertEqual(response.status_code,200)
+        url = reverse('signup')
+        self.assertEqual(resolve(url).func, signup)
 
-    # def test_testProfileManagement(self):
-    #     response = self.client.get('/ProfileManagement.html')
-    #     self.assertEqual(response.status_code,200)
+    def test_testProfileManagement(self):
+        url = reverse('ProfileManagement')
+        self.assertEqual(resolve(url).func, ProfileManagement)
 
-    # def test_testConfirmQuote(self):
-    #     response = self.client.get('/confirmQuote')
-    #     self.assertEqual(response.status_code,200)
+    def test_testconfirmQuote(self):
+        url = reverse('confirmQuote')
+        self.assertEqual(resolve(url).func, confirmQuote)
     
+    def test_testlogout(self):
+        url = reverse('logout')
+        self.assertEqual(resolve(url).func, logout)
+
+class testPricingModule(TestCase):
+    def setUp(self):
+        self.testuser=User.objects.create_user(username= 'dummy', password='test')
+        self.testProf = Profile( name = "test", email = "t@email.com", address1 = "1 street", city = "houston", state ="TX", zipcode="77777")
+        self.pm = PricingModule(self.testuser,11)
+        self.pm.user.state = 'LA'
+        self.pm.user.gallonsReq = 11
+        self.pm.user.current_price = 11
+
+    def test_init(self):
+        self.pm.__init__(self.testuser,11)
+        self.assertEqual(self.pm.current_price, 1.50)
+        self.assertEqual(self.pm.gallonsReq, 11)
+        self.assertEqual(self.pm.user, self.testuser)
+    
+    def test_states_factor(self):
+        self.pm.user.state = 'TX'
+        self.assertEqual(0.02, self.pm.states_factor())
+        self.pm.user.state = 'AL'
+        self.assertEqual(0.04, self.pm.states_factor())
+
+    def test_rate_history(self):
+        ae = FuelQuote.objects.none()
+        self.assertEqual(0.0, self.pm.rate_history())
+        res = FuelQuote.objects.create(
+            email = 'test@email.com',
+            gallonsRequested = 1,
+            deliveryAddress = '1 street',
+            deliverydate ='1/1/2000',
+            price = 10,
+            AmountDue = 10
+        )
+        ae = FuelQuote.objects.all()
+        self.assertEqual(0.01, self.pm.rate_history())
+            
+
+
+
+    def test_gallonsReq_factor(self):
+        self.pm.gallonsReq = 1001
+        self.assertEqual(0.03, self.pm.gallonsReq_factor())
+        self.pm.gallonsReq = 0
+        self.assertEqual(0.04, self.pm.gallonsReq_factor())
+    
+    def test_margin(self):
+        self.pm.user.state = 'AL' #location_factor should be 0.04
+        self.pm.current_price = 10
+        res = FuelQuote.objects.create(
+            email = 'test@email.com',
+            gallonsRequested = 1,
+            deliveryAddress = '1 street',
+            deliverydate ='1/1/2000',
+            price = 10,
+            AmountDue = 10
+        )#rate_history should be 0.01
+        self.pm.user.gallonsReq = 10 #gallonsReq_factor should be 0.04
+        margin = round((self.pm.current_price * (0.04 - 0.01 + 0.04 + 0.20)),3)
+        rounded_margin = round(margin,3)
+        self.assertEqual(rounded_margin,self.pm.margin())
+
+
+        
+
+    def test_calculate(self):
+        self.pm.current_price = 2
+        self.pm.gallonsReq = 2
+        self.assertEqual(((self.pm.margin() + self.pm.current_price)* self.pm.gallonsReq),self.pm.calculate())
+
+
+        
+
+class TestViews(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.login_url = reverse('login')
+        #print(resolve(self.login_url))
+
+    def test_post_like_user(self):
+        testuser=User.objects.create_user(username= 'dummy', password='test')
+        response = self.client.get(self.login_url)
+        self.assertEquals(response.status_code,200)
+        self.assertTemplateUsed(response, 'login.html')
+
+        
+
+
+

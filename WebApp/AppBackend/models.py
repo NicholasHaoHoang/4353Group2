@@ -7,6 +7,7 @@ class Feature(models.Model):
     details = models.CharField(max_length=500)
 
 class Profile(models.Model):
+    id = models.AutoField(primary_key=True, editable = True)
     name = models.CharField(max_length = 50)
     email = models.CharField(max_length=100,blank = True)
     address1 = models.CharField(max_length = 100)
