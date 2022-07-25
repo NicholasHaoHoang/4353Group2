@@ -46,22 +46,42 @@ class URLTests(TestCase):
     def test_testIndex(self):
         url = reverse('index')
         self.assertEqual(resolve(url).func, index)
+    
+    def test_URLIndex(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code,200)
 
     def test_testFuelQuote(self):
         url = reverse('fuelQuote')
         self.assertEqual(resolve(url).func, fuelQuote)
 
+    def test_URLFuelQuote(self):
+        response = self.client.get('/FuelQuote.html')
+        self.assertEqual(response.status_code,200)
+
     def test_FuelHistory(self):
         url = reverse('fuelHistory')
         self.assertEqual(resolve(url).func, fuelHistory)
+
+    def test_URLFuelHistory(self):
+        response = self.client.get('/FuelHistory.html')
+        self.assertEqual(response.status_code,200)
 
     def test_testLogin(self):
         url = reverse('login')
         self.assertEqual(resolve(url).func, login)
 
+    def test_URLLogin(self):
+        response = self.client.get('/login.html')
+        self.assertEqual(response.status_code,200)
+
     def test_testSignup(self):
         url = reverse('signup')
         self.assertEqual(resolve(url).func, signup)
+
+    def test_URLSignup(self):
+        response = self.client.get('/Signup.html')
+        self.assertEqual(response.status_code,200)
 
     def test_testProfileManagement(self):
         url = reverse('ProfileManagement')
