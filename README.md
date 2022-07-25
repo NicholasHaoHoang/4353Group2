@@ -1,6 +1,10 @@
 <a href="https://codecov.io/gh/NicholasHaoHoang/4353Group2" > 
  <img src="https://codecov.io/gh/NicholasHaoHoang/4353Group2/branch/main/graph/badge.svg?token=5EF2Y2MROP"/> 
 </a>
+<h1>
+^Click to view Coverage Report
+</h1>
+
 This will be the final group project of 4353 for Singh.
 
 Assignment 2:
