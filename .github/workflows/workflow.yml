@@ -10,18 +10,21 @@ jobs:
     
 
     steps:
-    - uses: checkout@master
+    - uses: actions/checkout@master
+
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
         fetch-depth: 2
+
     - name: Setup Python
       uses: actions/setup-python@master
 
 
     - name: Install dependencies
-      run: pip install coverage
-           pip install django
+      run: |
+        pip install coverage
+        pip install django
 
     - name: Run tests
       run: coverage run ./WebApp/manage.py test AppBackend -v 3 --force-color
