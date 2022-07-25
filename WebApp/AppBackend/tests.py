@@ -21,5 +21,5 @@ class ModelTest(TestCase):
 
 class URLTests(TestCase):
     def test_testIndex(self):
-        #response = self.client.get('/')
-        self.assertEqual(200,200)
+        response = self.client.get('/')
+        self.assertEqual(response.status_code,200)
