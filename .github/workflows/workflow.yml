@@ -24,4 +24,11 @@ jobs:
       run: coverage run ./WebApp/manage.py test AppBackend -v 3 --force-color
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+      uses: actions/checkout@master
+            codecov/codecov-action@v3
+      with:
+        files: ./coverage1.xml, ./coverage2.xml
+        name: codecov-umbrella
+        fail_ci_if_error: true
+        verbose: true
+    
