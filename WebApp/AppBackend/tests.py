@@ -95,6 +95,10 @@ class URLTests(TestCase):
         url = reverse('logout')
         self.assertEqual(resolve(url).func, logout)
 
+    def test_URLlogout(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code,200)
+
 class testPricingModule(TestCase):
     def setUp(self):
         self.testuser=User.objects.create_user(username= 'dummy', password='test')
@@ -170,13 +174,46 @@ class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
         self.login_url = reverse('login')
-        #print(resolve(self.login_url))
+        self.signup_url = reverse('signup')
+        self.confirmQuote_url = reverse('confirmQuote')
+        self.testUser = User.objects.create(
+            username = 'test',
+            email = 'test@email.com',
+            password = 'secret'
+        )
+         
 
-    def test_post_like_user(self):
+    def test_login_get(self):
         testuser=User.objects.create_user(username= 'dummy', password='test')
         response = self.client.get(self.login_url)
         self.assertEquals(response.status_code,200)
         self.assertTemplateUsed(response, 'login.html')
+    
+    def test_login_post(self):
+
+        response = self.client.post(self.login_url, {
+            'email': 'test@email.com',
+            'username': 'test',
+            'password': 'secret'
+        })
+
+        self.assertEquals(response.status_code, 302)
+        self.assertEquals(self.testUser.username, 'test')
+        self.assertEquals(self.testUser.password, 'secret')
+        self.assertEquals(self.testUser.email, 'test@email.com')
+
+    def test_signup_post(self):
+
+        response = self.client.post(self.signup_url, {
+            'email': 'test@email.com',
+            'confirmemail':'test@email.com',
+            'name': 'test',
+            'password': 'secret',
+            'confirmpassword': 'secret1'
+        })
+        self.assertEquals(response.status_code, 302)
+
+
 
         
 
