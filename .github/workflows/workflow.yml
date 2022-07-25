@@ -27,7 +27,8 @@ jobs:
       uses: actions/checkout@master
             codecov/codecov-action@v3
       with:
-        files: ./coverage1.xml, ./coverage2.xml
+        directory: ./WebApp/
+        files: ./coverage.xml
         name: codecov-umbrella
         fail_ci_if_error: true
         verbose: true
