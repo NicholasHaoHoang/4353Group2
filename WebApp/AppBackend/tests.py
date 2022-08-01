@@ -203,7 +203,7 @@ class TestViews(TestCase):
         self.assertEquals(self.testUser.email, 'test@email.com')
 
     def test_signup_post(self):
-
+        #password not match case
         response = self.client.post(self.signup_url, {
             'email': 'test@email.com',
             'confirmemail':'test@email.com',
@@ -211,7 +211,25 @@ class TestViews(TestCase):
             'password': 'secret',
             'confirmpassword': 'secret1'
         })
+        #password & email match case
+        response = self.client.post(self.signup_url, {
+            'email': 'test@email.com',
+            'confirmemail':'test@email.com',
+            'name': 'test',
+            'password': 'secret',
+            'confirmpassword': 'secret'
+        })
+        #email not match case
+        response = self.client.post(self.signup_url, {
+            'email': 'test1@email.com',
+            'confirmemail':'test@email.com',
+            'name': 'test',
+            'password': 'secret',
+            'confirmpassword': 'secret'
+        })
+        User.objects.create()
         self.assertEquals(response.status_code, 302)
+
 
 
 
