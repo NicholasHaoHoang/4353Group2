@@ -42,26 +42,36 @@
 </nav>
 <!--Add Functionality to pull current user's Profile Info from database in Assignment 4-->
 {% if user.is_authenticated%}
-    <h1>Current Profile Information</h1>
-    <h2>Name : {{name}}</h2>
-    <h2>Address: {{address1}} {{address2}}</h2>
-    <h2>State: {{state}}</h2>
-    <h2>City: {{city}}</h2>
-    <h2>Zipcode: {{zipcode}}</h2>
+<h4>{{message}}</h4>
+{{ user.get_username |json_script:'Email' }}
+{{ profile.name|json_script:'Name' }}
+{{ profile.address1|json_script:'Address1' }}
+{{ profile.address2|json_script:'Address2' }}
+{{ profile.state|json_script:'State' }}
+{{ profile.city|json_script:'City' }}
+{{ profile.zipcode|json_script:'Zipcode' }}
+
 {% endif %}
 <main class="login-form">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
+            
                     <div class="card-header">Profile Management Form</div>
                     <div class="card-body">
                         <form action="ProfileManagement.html" method="POST">
                             {% csrf_token %}
-							<div class="form-group row">
-                                <label for="Firstname" class="col-md-4 col-form-label text-md-right">Full Name</label>
+                            <div class="form-group row">
+                                <label for="Email" class="col-md-4 col-form-label text-md-right">Username</label>
                                 <div class="col-md-6">
-                                    <input type="text" id="firstname" class="form-control" placeholder="maximum 50, required" name="firstname" required autofocus>
+                                    <input type="text" id="email"  class="form-control" placeholder="maximum 50, required" name="firstname" required autofocus disabled="True">
+                                </div>
+                            </div>
+							<div class="form-group row">
+                                <label for="FirstnameLabel" class="col-md-4 col-form-label text-md-right">Full Name</label>
+                                <div class="col-md-6">
+                                    <input type="text" id="firstname"  class="form-control" placeholder="maximum 50, required" name="firstname" required autofocus>
                                 </div>
                             </div>
 							
@@ -78,12 +88,12 @@
                                 </div>
                             </div>
 							 <div class="form-group row">
-                                <label for="state" class="col-md-4 col-form-label text-md-right">State</label>
+                                <label for="stateLabel" class="col-md-4 col-form-label text-md-right">State</label>
                                 <div class="col-md-6">
                                     <p>
-                    <select name = "state" required="required"> <!--Drop down menu, below are options-->
+                    <select name = "state" id="state" required="required"> <!--Drop down menu, below are options-->
                         <option value = "">Please select a state...</option>
-                        <option value="AL">AL</option>
+                         <option value="AL">  AL</option> 
                         <option value="AK">AK</option>
                         <option value="AR">AR</option>
                         <option value="AZ">AZ</option>
@@ -143,21 +153,21 @@
 							<div class="form-group row">
                                 <label for="city" class="col-md-4 col-form-label text-md-right">City</label>
                                 <div class="col-md-6">
-                                    <input type="text" id="city" class="form-control" placeholder="100 characters, required" name="city" required autofocus>
+                                    <input type="text" id="city"  class="form-control" placeholder="100 characters, required" name="city" required autofocus>
                                 </div>
                             </div>
                            
                             <div class="form-group row">
                                 <label for="zipcode" class="col-md-4 col-form-label text-md-right">Zip Code</label>
                                 <div class="col-md-6">
-                                   <p><input pattern = "[0-9]*" minlength="5" maxlength="9" placeholder="5-9 Characters" type="text" name="zipcode" id = "zipcode"  required="required"></p>
+                                   <p><input pattern = "[0-9]*" minlength="5" maxlength="9" placeholder="5-9 Characters" type="number"  name="zipcode" id = "zipcode"  required="required"></p>
 									</p> 
                                 </div>
                             </div>
 
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    Register
+                                    Save
                                 </button>
                                
                             </div>
@@ -178,6 +188,15 @@
 
 
 </body>
-</html>
 
+<script type="text/javascript"> 
+    document.getElementById("email").value = JSON.parse(document.getElementById('Email').text);
+    document.getElementById("firstname").value = JSON.parse(document.getElementById('Name').text);
+    document.getElementById("address1").value = JSON.parse(document.getElementById('Address1').text);
+    document.getElementById("address2").value = JSON.parse(document.getElementById('Address2').text);
+    document.getElementById("city").value = JSON.parse(document.getElementById('City').text);
+    document.getElementById("zipcode").value = JSON.parse(document.getElementById('Zipcode').text);
+    document.getElementById("state").value = JSON.parse(document.getElementById('State').text);
+  </script>
+</html>
 

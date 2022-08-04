@@ -67,8 +67,8 @@ def  fuelQuote(request):
     profile = Profile.objects.filter(email=request.user)
     print(profile[0].email)
     # profile = Profile(email=request.user)
-    print(profile[0].address1)
-    return render(request, 'FuelQuote.html',{'DeliveryAddress':profile[0].address1 + ' '+ profile[0].address2,'Price':500,'Amount':0})
+    address = profile[0].address1 +", " +profile[0].address2
+    return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':500,'Amount':0})
 
 #Rendering login.html
 def  login(request):
@@ -139,35 +139,50 @@ def  ProfileManagement(request):
         #Insert code for Profile Management here
     #current user, use in Assignment 4 to pull info
     current_user = request.user
-    #prof  = Profile of current user
-    prof = {
-        'name' : 'Nick',
-        'address1' : 'home street',
-        'address2' : '',
-        'state' : 'TX',
-        'city' : 'Houston',
-        'zipcode' : '77444'
-    }
+
+    # prof  = Profile of current user
+    # profile_dict = {
+    #     'name' : 'asdada',
+    #     'address1' : '',
+    #     'address2' : '',
+    #     'state' : 'TX',
+    #     'city' : '',
+    #     'zipcode' : '77444'
+    # }
     if request.user.is_authenticated:
+        profile = Profile.objects.filter(email=current_user)
+        profile_dict ={
+            "profile":profile[0]   
+        }
+        print(profile_dict)
+        name = request.POST.get('firstname')
+        address1 = request.POST.get('address1')
+        address2 = request.POST.get('address2')
+        state = request.POST.get('state')
+        city = request.POST.get('city')
+        zipcode = request.POST.get('zipcode')
         if request.method == 'POST':
-            #Pull from Database, Implement this part in Assignment 4
-            """
-            name = request.POST.get('firstname')
-            address1 = request.POST.get('address1')
-            address2 = request.POST.get('address2')
-            state = request.POST.get('state')
-            city = request.POST.get('city')
-            zipcode = request.POST.get('zipcode')
-            
-            prof = Profile.objects.create(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
-            prof.save()
-            """
-            
-            return render(request,'ProfileManagement.html',prof)
+            if not profile.exists():
+                #Pull from Database, Implement this part in Assignment 4
+                prof = Profile.objects.create(email = current_user,name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
+                profile_dict["profile"] = prof[0]
+                print(profile_dict["profile"])
+                return render(request,'ProfileManagement.html',profile_dict)
+            else:
+                prof = Profile.objects.update(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
+                if prof == 1:
+                    message = "Data updated successfully"
+                else:
+                    message = "Data not updated successfully"
+                profile_dict["message"] = message
+                print(profile_dict["message"])
+                return render(request,'ProfileManagement.html',profile_dict)
+         
         else:
-            return render(request,'ProfileManagement.html',prof)
+
+            return render(request,'ProfileManagement.html',profile_dict)
     else:
-        messages.info(request, 'Please Login to manage your profile');
+        messages.info(request, 'Please Login to manage your profile')
         return redirect('login.html')
     #END CODE
         
