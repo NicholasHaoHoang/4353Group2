@@ -49,12 +49,14 @@
                 <div class="card">
                     <div class="card-header">Fuel Quote Form</div>
                     <div class="card-body">
+                        {% for message in messages %}
                         <h6>{{message}}</h6>
+                        {% endfor %}
                         <form action="confirmQuote" method="Get">
 							<div class="form-group row">
                                 <label for="Firstname" class="col-md-4 col-form-label text-md-right">Gallons Requested</label>
                                 <div class="col-md-6">
-                                    <input type="number" id="gallonsReq" class="form-control" placeholder="numbers only, required" name="gallonsReq" required autofocus>
+                                    <input type="number" id="gallonsReq" class="form-control" value="{{GallonsReq}}" placeholder="numbers only, required" name="gallonsReq" required autofocus>
                                 </div>
                             </div>
 							
@@ -67,7 +69,7 @@
 							  <div class="form-group row">
                                 <label for="DeliveryDate" class="col-md-4 col-form-label text-md-right">Delivery Date</label>
                                 <div class="col-md-6">
-                                    <input type="date" id="deliverydate" class="form-control"  name="deliverydate" autofocus>
+                                    <input type="date" id="deliverydate" class="form-control" value="{{Deliverydate}}"   name="deliverydate" autofocus>
                                 </div>
                             </div>
 							
@@ -126,7 +128,15 @@
             );
           }
         );
-    
+        $('#price').on('input',
+          function(e) {
+            console.log("changing")
+            $('#AmountDue').val(
+                parseFloat($(this).val()) * parseFloat($('#gallonsReq').val()) 
+             
+            );
+          }
+        );
       }
     );
     </script>
