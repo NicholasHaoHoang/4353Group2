@@ -18,7 +18,7 @@ class Profile(models.Model):
 # class UserDetails(models.Model):
 #     email = models.CharField(primary_key=True,max_length=100,blank = True)
 #     name = models.CharField(max_length=100)
-#     # ID = models.AutoField()
+#     ID = models.AutoField()
 
 class FuelQuote(models.Model):
     email = models.CharField(max_length=100,blank = True)

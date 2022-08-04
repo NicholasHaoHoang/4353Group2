@@ -15,7 +15,8 @@ def index(request):
 
     #END CODE
 
-    return render(request, 'login.html')
+    return render(request, 'landing.html')
+
 
 #Rendering FuelHistory.html
 def  fuelHistory(request):
