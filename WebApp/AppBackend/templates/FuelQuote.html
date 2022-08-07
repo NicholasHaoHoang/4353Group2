@@ -53,7 +53,7 @@
                         <h6>{{message}}</h6>
                         <form action="confirmQuote" method="Get">
 							<div class="form-group row">
-                                <label for="Firstname" class="col-md-4 col-form-label text-md-right">Gallons Requested</label>
+                                <label for="gallonsReq" class="col-md-4 col-form-label text-md-right">Gallons Requested</label>
                                 <div class="col-md-6">
                                     <input type="number" id="gallonsReq" class="form-control" placeholder="numbers only, required" name="gallonsReq" required autofocus>
                                 </div>
@@ -91,6 +91,12 @@
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
                                     Submit
+                                </button>
+                               
+                            </div>
+                            <div class="col-md-6 offset-md-6">
+                                <button type="submit" class="btn btn-primary" formmethod = "get" formaction = "FuelQuote.html">
+                                    Get Quote
                                 </button>
                                
                             </div>

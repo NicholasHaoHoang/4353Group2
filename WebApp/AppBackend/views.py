@@ -1,3 +1,4 @@
+from xml.etree.ElementTree import QName
 from django.shortcuts import render
 from django.http import HttpResponse
 import datetime
@@ -15,7 +16,7 @@ def index(request):
 
     #END CODE
 
-    return render(request, 'landing.html')
+    return render(request, 'login.html')
 
 
 #Rendering FuelHistory.html
@@ -25,34 +26,7 @@ def  fuelHistory(request):
         return render(request, 'login.html')
     else:
         #Insert code for Fuel History Here
-        data = [
-            {
-            'Name': 'Younus',
-            'GallonsRequested': '100',
-            'DeliveryAddress': 'ABCD address',
-            'DeliveryDate': '10-20-2022',
-            'SuggestedPrice': '1000',
-            'AmountDue': '10'
-            },
-            {
-            'Name': 'Nick',
-            'GallonsRequested': '200',
-            'DeliveryAddress': 'XYZ address',
-            'DeliveryDate': '11-21-2022',
-            'SuggestedPrice': '200',
-            'AmountDue': '02'
-            },
-            {
-            'Name': 'Leena',
-            'GallonsRequested': '400',
-            'DeliveryAddress': 'DEF address',
-            'DeliveryDate': '11-21-2012',
-            'SuggestedPrice': '20',
-            'AmountDue': '50'
-            }
-        ]
-
-        data = FuelQuote.objects.all()
+        data = FuelQuote.objects.filter(email = request.user.email)
     #END CODE
 
     return render(request, 'FuelHistory.html',{'data':data})
@@ -68,8 +42,14 @@ def  fuelQuote(request):
     profile = Profile.objects.filter(email=request.user)
     print(profile[0].email)
     # profile = Profile(email=request.user)
-    address = profile[0].address1 +", " +profile[0].address2
-    return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':500,'Amount':0})
+    address = profile[0].address1 +" " +profile[0].address2
+    # if(request.method == 'GET'):
+    #     gallons = request.GET.get('gallonsReq')
+    #     priceMod = PricingModule(request.user,gallons)
+    #     price = priceMod.calculate()
+    #     return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':1.64,'Amount':0})
+
+    return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':1.85,'Amount':0})
 
 #Rendering login.html
 def  login(request):
@@ -99,6 +79,8 @@ def logout(request):
     auth.logout(request)
     print(request.user)
     return redirect('/')
+
+
 #Rendering Signup.html
 def signup(request):
     #Insert code for Sign up here
@@ -129,7 +111,7 @@ def signup(request):
     else:
         return render(request, 'Signup.html')  
     
-    #END CODE
+
     
 
 #Rendering ProfileManagement.html
@@ -140,20 +122,10 @@ def  ProfileManagement(request):
         #Insert code for Profile Management here
     #current user, use in Assignment 4 to pull info
     current_user = request.user
-
-    # prof  = Profile of current user
-    # profile_dict = {
-    #     'name' : 'asdada',
-    #     'address1' : '',
-    #     'address2' : '',
-    #     'state' : 'TX',
-    #     'city' : '',
-    #     'zipcode' : '77444'
-    # }
     if request.user.is_authenticated:
         profile = Profile.objects.filter(email=current_user)
         profile_dict ={
-            "profile":profile[0]   
+            "profile":profile
         }
         print(profile_dict)
         name = request.POST.get('firstname')
@@ -166,17 +138,25 @@ def  ProfileManagement(request):
             if not profile.exists():
                 #Pull from Database, Implement this part in Assignment 4
                 prof = Profile.objects.create(email = current_user,name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
-                profile_dict["profile"] = prof[0]
-                print(profile_dict["profile"])
-                return render(request,'ProfileManagement.html',profile_dict)
-            else:
-                prof = Profile.objects.update(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
+                profile_dict["profile"] = prof
                 if prof == 1:
                     message = "Data updated successfully"
                 else:
                     message = "Data not updated successfully"
                 profile_dict["message"] = message
                 print(profile_dict["message"])
+                print(profile_dict["profile"])
+                return render(request,'ProfileManagement.html',profile_dict)
+            else:
+                prof = Profile.objects.filter(email=current_user.email).update(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
+                profile_dict["profile"] = prof
+                if prof == 1:
+                    message = "Data updated successfully"
+                else:
+                    message = "Data not updated successfully"
+                profile_dict["message"] = message
+                print(profile_dict["message"])
+                print(prof)
                 return render(request,'ProfileManagement.html',profile_dict)
          
         else:
@@ -252,13 +232,18 @@ def confirmQuote(request):
 
 #PricingModule Class
 class PricingModule:
+    def PricingModule(self,user,galls_req):
+        self.current_price = 1.50
+        self.gallonsReq = galls_req
+        self.user = user
     def __init__(self, user, galls_req):
         self.current_price = 1.50
         self.gallonsReq = galls_req
         self.user = user
 
     def states_factor(self):
-        if self.user.state == 'TX':
+        cur_profile = Profile.objects.filter(email = self.user.email)
+        if cur_profile[0].state == 'TX':
             return 0.02
         else:
             return 0.04
@@ -276,7 +261,7 @@ class PricingModule:
             return 0.0
 
     def gallonsReq_factor(self):
-        if int(self.gallonsReq) > 1000:
+        if self.gallonsReq > 1000:
             return 0.03
         else:
             return 0.04
