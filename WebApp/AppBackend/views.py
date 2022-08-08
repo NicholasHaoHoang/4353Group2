@@ -49,16 +49,18 @@ def  fuelQuote(request):
             print(f"Gallons found, Calculating with {gallons} gallons")
             priceMod = PricingModule(request.user,gallons)
             price = priceMod.calculate()
+            price = round(price,2)
             print(f"Price: {price}")
         else:
             gallons = 1
             print(f"No gallons found, Calculating with {gallons} gallons")
             priceMod = PricingModule(request.user,gallons)
             price = priceMod.calculate()
+            price = round(price,2)
             print(f"Price: {price}")
         return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':price,'Amount':0})
 
-    return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':1.85,'Amount':0})
+    return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'enterprice':"Enter values to get your price",'Amount':0})
 
 #Rendering login.html
 def  login(request):
@@ -155,17 +157,18 @@ def  ProfileManagement(request):
                 #Pull from Database, Implement this part in Assignment 4
                 prof = Profile.objects.create(email = current_user,name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
                 profile_dict['profile'] = prof
-                message = "Data updated successfully"
+                message = "Data updated successfully, Make an order now"
                 profile_dict["message"] = message
             else:
                 prof = Profile.objects.filter(email=current_user.email).update(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
                 profile_dict['profile'] = Profile.objects.filter(email=current_user)
                 if prof == 1:
-                    message = "Data updated successfully"
+                    message = "Data updated successfully, Make an order now"
                 else:
                     message = "Data not updated successfully"
+                    return render(request,'ProfileManagement.html',profile_dict)
                 profile_dict["message"] = message
-            return render(request,'ProfileManagement.html',profile_dict)
+            return fuelQuote(request)
          
         else:
 
@@ -189,8 +192,8 @@ def getQuote(request):
             "gallonsReq":gallonsReq,
             "DeliveryAddress":deliveryAddress,
             "deliverydate":deliverydate,
-            "Price":price,
-            "Amount":AmountDue
+            "Price":round(float(price),2),
+            "AmountDue":AmountDue
         }
         print(quote_dict)
         
@@ -199,9 +202,9 @@ def getQuote(request):
             return render(request, "FuelQuote.html",quote_dict)
         else:
             gallonsReq=float(request.GET['gallonsReq'])
-            price = priceMod.calculate()
+            price = round(priceMod.calculate(),2)
             AmountDue = float(gallonsReq)*float(price)
-            quote_dict["AmountDue"] = AmountDue
+            quote_dict["AmountDue"] = round(AmountDue,2)
 
         month,day,year=deliverydate.split('-')
         isValid=True
@@ -346,6 +349,6 @@ class PricingModule:
     
     def calculate(self):
         
-        result = (self.margin() + self.current_price) * self.gallonsReq
+        result = (self.margin() + 1.5)
         print("result", result)
         return result

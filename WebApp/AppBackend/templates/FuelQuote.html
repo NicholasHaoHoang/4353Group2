@@ -76,14 +76,14 @@
 							<div class="form-group row">
                                 <label for="Price" class="col-md-4 col-form-label text-md-right">Price / gallon</label>
                                 <div class="col-md-6">
-                                    <input type="numbers" id="price" class="form-control" value="{{Price}}"  name="price" required autofocus readonly>
+                                    <input type="numbers" id="price" class="form-control" placeholder = "{{enterprice}}" value="{{Price}}"  name="price" required autofocus readonly>
                                 </div>
                             </div>
                            
                             <div class="form-group row">
                                 <label for="AmountDue" class="col-md-4 col-form-label text-md-right">Total Amount Due</label>
                                 <div class="col-md-6">
-                                   <p><input type="numbers" name="AmountDue" value={{Amount}} id = "AmountDue"  required readonly></p>
+                                   <p><input type="numbers" name="AmountDue" value="{{AmountDue}}" id = "AmountDue"  required readonly></p>
 									</p> 
                                 </div>
                             </div>
@@ -121,21 +121,21 @@
 
 <script>
 
-    $(document).ready(
-      function() {
-        event.preventDefault();
-        $('#gallonsReq').on('input',
-          function(e) {
-            console.log("changing")
-            $('#AmountDue').val(
-                (parseFloat($(this).val()) * parseFloat($('#price').val())).toFixed(2) 
+    // $(document).ready(
+    //   function() {
+    //     event.preventDefault();
+    //     $("button").on("click",
+    //       function(e) {
+    //         console.log("changing")
+    //         $('#AmountDue').val(
+    //             (parseFloat($(this).val()) * parseFloat($('#price').val())).toFixed(2) 
              
-            );
-          }
-        );
+    //         );
+    //       }
+    //     );
     
-      }
-    );
+    //   }
+    // );
     </script>
 </html>
 
