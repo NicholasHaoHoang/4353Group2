@@ -34,20 +34,27 @@ def  fuelHistory(request):
 #Rendering FuelQuote.html
 def  fuelQuote(request):
     #Insert code for Fuel Quote here
-    print(request.user)
+    print(f"In Fuel Quote: \nCurrentUser: {request.user}")
 
     if request.user.is_authenticated == False or request.user.is_superuser :
         return render(request, 'login.html')
     #END CODE
     profile = Profile.objects.filter(email=request.user)
-    print(profile[0].email)
-    # profile = Profile(email=request.user)
     address = profile[0].address1 +" " +profile[0].address2
-    # if(request.method == 'GET'):
-    #     gallons = request.GET.get('gallonsReq')
-    #     priceMod = PricingModule(request.user,gallons)
-    #     price = priceMod.calculate()
-    #     return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':1.64,'Amount':0})
+    if(request.method == 'GET'):
+        gallons = request.GET.get('gallonsReq')
+        if gallons:
+            print(f"Gallons found, Calculating with {gallons} gallons")
+            priceMod = PricingModule(request.user,gallons)
+            price = priceMod.calculate()
+            print(f"Price: {price}")
+        else:
+            gallons = 1
+            print(f"No gallons found, Calculating with {gallons} gallons")
+            priceMod = PricingModule(request.user,gallons)
+            price = priceMod.calculate()
+            print(f"Price: {price}")
+        return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':price,'Amount':0})
 
     return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':1.85,'Amount':0})
 
@@ -72,12 +79,12 @@ def  login(request):
 
 #Logout Function
 def logout(request):
+    print(f"{request.user} was logged out")
     request.session.flush()
-    print(request.user)
+    
 
     
     auth.logout(request)
-    print(request.user)
     return redirect('/')
 
 
@@ -117,7 +124,6 @@ def signup(request):
 #Rendering ProfileManagement.html
 def  ProfileManagement(request):
     if request.user.is_authenticated == False or request.user.is_superuser :
-        print("logout")
         return render(request, '/')
         #Insert code for Profile Management here
     #current user, use in Assignment 4 to pull info
@@ -126,8 +132,9 @@ def  ProfileManagement(request):
         profile = Profile.objects.filter(email=current_user)
         profile_dict ={
             "profile":profile
+            
         }
-        print(profile_dict)
+        print(f"In Profile Management: \nCurrent User: {current_user}")
         name = request.POST.get('firstname')
         address1 = request.POST.get('address1')
         address2 = request.POST.get('address2')
@@ -141,8 +148,6 @@ def  ProfileManagement(request):
                 profile_dict["profile"] = prof
                 if prof == 1:
                     message = "Data updated successfully"
-                else:
-                    message = "Data not updated successfully"
                 profile_dict["message"] = message
                 print(profile_dict["message"])
                 print(profile_dict["profile"])
@@ -167,33 +172,33 @@ def  ProfileManagement(request):
         return redirect('login.html')
     #END CODE
         
-
-
-def confirmQuote(request):
+def getQuote(request):
+    print("In getQuote:\n")
     if request.method == "GET":
         gallonsReq=request.GET.get('gallonsReq')
         deliveryAddress=request.GET.get('deliveryAddress')
         deliverydate=request.GET.get('deliverydate')
-        price=request.GET.get('price')
+        priceMod = PricingModule(request.user,int(gallonsReq))
+        price = priceMod.calculate()
+        print(f"Price: {price}")
         AmountDue=request.GET.get('AmountDue')
-        if int(request.GET.get('gallonsReq'))<1 or request.GET.get('gallonsReq').isdigit()==False:
-            return render(request, "FuelQuote.html",{"gallonsReq":gallonsReq,"message":"Gallons requested must be a number"})
-        else:
-            gallonsReq=int(request.GET['gallonsReq'])
-            
-        if int(request.GET['price'])<1 or request.GET['price'].isdigit()==False:
-            return render(request, "FuelQuote.html",{"price":gallonsReq,"message":"Price must be a number"})
-        else:
-            price=int(request.GET['price'])
+        quote_dict={
+            "gallonsReq":gallonsReq,
+            "DeliveryAddress":deliveryAddress,
+            "deliverydate":deliverydate,
+            "Price":price,
+            "Amount":AmountDue
+        }
+        print(quote_dict)
         
-        if request.GET['AmountDue'].isdigit()==False:
-            return render(request, "FuelQuote.html",{"AmountDue":gallonsReq,"message":"Amount Due must be a number"})
+        if int(request.GET.get('gallonsReq'))<1 or request.GET.get('gallonsReq').isdigit()==False:
+            quote_dict["message"]="Gallons requested must be an integer"
+            return render(request, "FuelQuote.html",quote_dict)
         else:
-            AmountDue=int(request.GET['AmountDue'])
-        if request.GET['AmountDue'].isdigit()==False:
-            return render(request, "FuelQuote.html",{"AmountDue":gallonsReq,"message":"Amount Due must be a number"})
-        else:
-            AmountDue=int(request.GET['AmountDue'])
+            gallonsReq=float(request.GET['gallonsReq'])
+            price = priceMod.calculate()
+            AmountDue = float(gallonsReq)*float(price)
+            quote_dict["AmountDue"] = AmountDue
 
         month,day,year=deliverydate.split('-')
         isValid=True
@@ -202,8 +207,10 @@ def confirmQuote(request):
 
         except ValueError:
             isValid=False
+
         if isValid==False:
-            return render(request, "FuelQuote.html",{"deliverydate":gallonsReq,"message":"Delivery date is not in correct format"})
+            quote_dict["message"] = "Delivery date is not in correct format"
+            return render(request, quote_dict)
             
         
         print(gallonsReq)
@@ -219,12 +226,61 @@ def confirmQuote(request):
             gallonsRequested = gallonsReq,
             deliveryAddress = deliveryAddress,
             deliverydate =deliverydate,
-            price =price,
-            AmountDue =AmountDue
+            price = float(price),
+            AmountDue = float(AmountDue)
         )
-        # rand = randint(0,1000)
-        # timeNow = round(time.time()*1000)
-        # quoteNo =rand+timeNow
+        return render(request, "FuelQuote.html",quote_dict)
+    else:
+        return render(request,"FuelQuote.html")
+
+def confirmQuote(request):
+    if request.method == "GET":
+        gallonsReq=request.GET.get('gallonsReq')
+        deliveryAddress=request.GET.get('deliveryAddress')
+        deliverydate=request.GET.get('deliverydate')
+        price=request.GET.get('price')
+        AmountDue=request.GET.get('AmountDue')
+        quote_dict={
+            "gallonsReq":gallonsReq,
+            "deliveryAddress":deliveryAddress,
+            "deliverydate":deliverydate,
+            "price":price,
+            "AmountDue":AmountDue
+        }
+        if int(request.GET.get('gallonsReq'))<1 or request.GET.get('gallonsReq').isdigit()==False:
+            return render(request, "FuelQuote.html",{"gallonsReq":gallonsReq,"message":"Gallons requested must be an integer"})
+        else:
+            gallonsReq=float(request.GET['gallonsReq'])
+
+        month,day,year=deliverydate.split('-')
+        isValid=True
+        try:
+            datetime.datetime(int(month),int(day),int(year))
+
+        except ValueError:
+            isValid=False
+
+        if isValid==False:
+            quote_dict["message"] = "Delivery date is not in correct format"
+            return render(request, quote_dict)
+            
+        
+        print(gallonsReq)
+        print(deliveryAddress)
+        print(deliverydate)
+        print(price)
+        print(AmountDue)
+
+
+
+        res = FuelQuote.objects.create(
+            email = request.user,
+            gallonsRequested = gallonsReq,
+            deliveryAddress = deliveryAddress,
+            deliverydate =deliverydate,
+            price = float(price),
+            AmountDue = float(AmountDue)
+        )
         
         return render(request, "confirmQuote.html",{'quoteNo':res.quoteId})
     else:
@@ -261,7 +317,7 @@ class PricingModule:
             return 0.0
 
     def gallonsReq_factor(self):
-        if self.gallonsReq > 1000:
+        if int(self.gallonsReq) > 1000:
             return 0.03
         else:
             return 0.04

@@ -11,5 +11,6 @@ urlpatterns = [
     path('Signup.html', views.signup, name='signup'),
     path('ProfileManagement.html', views.ProfileManagement, name='ProfileManagement'),
     path('confirmQuote',views.confirmQuote, name="confirmQuote"),
+    path('getQuote',views.getQuote, name="getQuote"),
     path('logout',views.logout, name='logout')
 ]

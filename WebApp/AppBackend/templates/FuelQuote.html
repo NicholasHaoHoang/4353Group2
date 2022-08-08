@@ -55,7 +55,7 @@
 							<div class="form-group row">
                                 <label for="gallonsReq" class="col-md-4 col-form-label text-md-right">Gallons Requested</label>
                                 <div class="col-md-6">
-                                    <input type="number" id="gallonsReq" class="form-control" placeholder="numbers only, required" name="gallonsReq" required autofocus>
+                                    <input type="number" id="gallonsReq" class="form-control" placeholder="numbers only, required" name="gallonsReq" value = {{gallonsReq}} required autofocus value="0">
                                 </div>
                             </div>
 							
@@ -68,15 +68,15 @@
 							  <div class="form-group row">
                                 <label for="DeliveryDate" class="col-md-4 col-form-label text-md-right">Delivery Date</label>
                                 <div class="col-md-6">
-                                    <input type="date" id="deliverydate" class="form-control"  name="deliverydate" autofocus>
+                                    <input type="date" id="deliverydate" class="form-control"  name="deliverydate" value = "{{deliverydate}}" required="true">
                                 </div>
                             </div>
 							
 					
 							<div class="form-group row">
-                                <label for="Price" class="col-md-4 col-form-label text-md-right">Suggested Price / gallon</label>
+                                <label for="Price" class="col-md-4 col-form-label text-md-right">Price / gallon</label>
                                 <div class="col-md-6">
-                                    <input type="numbers" id="price" class="form-control" value={{Price}} placeholder="100" name="price" required autofocus readonly>
+                                    <input type="numbers" id="price" class="form-control" value="{{Price}}"  name="price" required autofocus readonly>
                                 </div>
                             </div>
                            
@@ -95,7 +95,7 @@
                                
                             </div>
                             <div class="col-md-6 offset-md-6">
-                                <button type="submit" class="btn btn-primary" formmethod = "get" formaction = "FuelQuote.html">
+                                <button type="submit" class="btn btn-primary" formmethod = "GET" formaction = "getQuote">
                                     Get Quote
                                 </button>
                                
@@ -128,7 +128,7 @@
           function(e) {
             console.log("changing")
             $('#AmountDue').val(
-                parseFloat($(this).val()) * parseFloat($('#price').val()) 
+                (parseFloat($(this).val()) * parseFloat($('#price').val())).toFixed(2) 
              
             );
           }

@@ -64,15 +64,15 @@
                         <form action="ProfileManagement.html" method="POST">
                             {% csrf_token %}
                             <div class="form-group row">
-                                <label for="Email" class="col-md-4 col-form-label text-md-right">Username</label>
+                                <label for="email" class="col-md-4 col-form-label text-md-right">Username</label>
                                 <div class="col-md-6">
-                                    <input type="text" id="email"  class="form-control" placeholder="maximum 50, required" name="firstname" required autofocus disabled="True">
+                                    <input type="text" id="email"  class="form-control" placeholder="maximum 50, required" name="email" required autofocus disabled="True">
                                 </div>
                             </div>
 							<div class="form-group row">
                                 <label for="FirstnameLabel" class="col-md-4 col-form-label text-md-right">Full Name</label>
                                 <div class="col-md-6">
-                                    <input type="text" id="firstname"  class="form-control" placeholder="maximum 50, required" name="firstname" required autofocus>
+                                    <input type="text" id="firstname" value="{fullname}"  class="form-control" placeholder="maximum 50, required" name="firstname" required autofocus>
                                 </div>
                             </div>
 							
