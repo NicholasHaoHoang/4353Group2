@@ -1,3 +1,5 @@
+from calendar import c
+from re import S
 from xml.etree.ElementTree import QName
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -131,8 +133,7 @@ def  ProfileManagement(request):
     if request.user.is_authenticated:
         profile = Profile.objects.filter(email=current_user)
         profile_dict ={
-            "profile":profile
-            
+            "profile":profile[0]
         }
         print(f"In Profile Management: \nCurrent User: {current_user}")
         name = request.POST.get('firstname')
@@ -141,28 +142,30 @@ def  ProfileManagement(request):
         state = request.POST.get('state')
         city = request.POST.get('city')
         zipcode = request.POST.get('zipcode')
+        profile_dict["fullname"] = profile[0].name
+        profile_dict["address1"] = profile[0].address1
+        profile_dict["address2"] = profile[0].address2
+        profile_dict["state"] = profile[0].state
+        profile_dict["city"] = profile[0].city
+        profile_dict["zipcode"] = profile[0].zipcode
         if request.method == 'POST':
+            print(f"POST METHOD: \nDictionary: {profile_dict}")
+            prof = profile
             if not profile.exists():
                 #Pull from Database, Implement this part in Assignment 4
                 prof = Profile.objects.create(email = current_user,name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
-                profile_dict["profile"] = prof
-                if prof == 1:
-                    message = "Data updated successfully"
+                profile_dict['profile'] = prof
+                message = "Data updated successfully"
                 profile_dict["message"] = message
-                print(profile_dict["message"])
-                print(profile_dict["profile"])
-                return render(request,'ProfileManagement.html',profile_dict)
             else:
                 prof = Profile.objects.filter(email=current_user.email).update(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
-                profile_dict["profile"] = prof
+                profile_dict['profile'] = Profile.objects.filter(email=current_user)
                 if prof == 1:
                     message = "Data updated successfully"
                 else:
                     message = "Data not updated successfully"
                 profile_dict["message"] = message
-                print(profile_dict["message"])
-                print(prof)
-                return render(request,'ProfileManagement.html',profile_dict)
+            return render(request,'ProfileManagement.html',profile_dict)
          
         else:
 
