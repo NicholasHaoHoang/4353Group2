@@ -39,8 +39,16 @@ class ModelTest(TestCase):
         w = self.create_FuelQuote()
         self.assertTrue(isinstance(w, FuelQuote))
 
-
-    
+#younus added
+#--------------------------------------------------------------------------------
+    def create_FuelHistory(self, email="test@email.com"):
+        return FuelQuote.objects.filter(email = email)
+    def test_FuelHistory_creation(self):
+        w = self.create_FuelQuote()
+        print(type(w))
+        self.assertTrue(isinstance(w, FuelQuote))
+#--------------------------------------------------------------------------------
+   
 
 class URLTests(TestCase):
     def test_testIndex(self):
@@ -176,6 +184,7 @@ class TestViews(TestCase):
         self.login_url = reverse('login')
         self.signup_url = reverse('signup')
         self.confirmQuote_url = reverse('confirmQuote')
+        self.getQuotes_url = reverse('getQuote')
         self.testUser = User.objects.create(
             username = 'test',
             email = 'test@email.com',
@@ -232,8 +241,108 @@ class TestViews(TestCase):
 
 
 
+    def test_fuelQuote_get(self):
+        #no galon
+        response = self.client.get(self.confirmQuote_url, {
+            'gallonsReq': '',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': '122'
+        })
+        print(response)
+        #no AmountDue
+        response = self.client.get(self.confirmQuote_url, {
+            'gallonsReq': '10',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        print(response)
+       #No delivery date
+        response = self.client.post(self.confirmQuote_url, {
+            'gallonsReq': '10',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        print(response)
+        #gallons < 0
+        response = self.client.post(self.confirmQuote_url, {
+            'gallonsReq': '0',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        print(response)
+        #date format wrong
+        response = self.client.post(self.confirmQuote_url, {
+            'gallonsReq': '0',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-0817',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        print(response)
+        #correct case
+        response = self.client.post(self.confirmQuote_url, {
+            'gallonsReq': '10',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': '100'
+        })
+        print(response)
+        User.objects.create()
+        self.assertEquals(response.status_code, 302)
 
-        
 
+    def test_getQuote_get(self):
+        #no gallon req
+        response = self.client.get(self.getQuotes_url, {
+            'gallonsReq': '',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+       
+        #No delivery date
+        response = self.client.post(self.getQuotes_url, {
+            'gallonsReq': '10',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        #gallons < 0
+        response = self.client.post(self.getQuotes_url, {
+            'gallonsReq': '0',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        #date format wrong
+        response = self.client.post(self.getQuotes_url, {
+            'gallonsReq': '0',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-0817',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        #correct case
+        response = self.client.post(self.getQuotes_url, {
+            'gallonsReq': '10',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        User.objects.create()
+        self.assertEquals(response.status_code, 302)
 
 
