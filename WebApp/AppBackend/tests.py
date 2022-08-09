@@ -251,6 +251,15 @@ class TestViews(TestCase):
             'AmountDue': '122'
         })
         print(response)
+        #Gallon not integer
+        response = self.client.get(self.confirmQuote_url, {
+            'gallonsReq': 'a',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': '122'
+        })
+        self.assertEquals(response.status_code, 200)
         #no AmountDue
         response = self.client.get(self.confirmQuote_url, {
             'gallonsReq': '10',

@@ -291,7 +291,7 @@ def confirmQuote(request):
             print("Debug")
             return render(request, "FuelQuote.html")
       
-        elif int(request.GET.get('gallonsReq'))<1 or request.GET.get('gallonsReq').isdigit()==False:
+        elif request.GET.get('gallonsReq').isdigit()==False:
             messages.info(request, 'Gallons requested must be an integer')
             print("Debug")
             return render(request, "FuelQuote.html")
