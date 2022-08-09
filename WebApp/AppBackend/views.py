@@ -217,7 +217,10 @@ def getQuote(request):
         }
         print(quote_dict)
         
-        if int(request.GET.get('gallonsReq'))<1 or request.GET.get('gallonsReq').isdigit()==False:
+        if  request.GET.get('gallonsReq') == '' :
+            quote_dict["message"]="Gallons requested can not be null"
+            return render(request, "FuelQuote.html",quote_dict)
+        elif int(request.GET.get('gallonsReq'))<1 or request.GET.get('gallonsReq').isdigit()==False:
             quote_dict["message"]="Gallons requested must be an integer"
             return render(request, "FuelQuote.html",quote_dict)
         else:
@@ -274,7 +277,21 @@ def confirmQuote(request):
             "AmountDue":AmountDue
         }
 
-        if int(request.GET.get('gallonsReq'))<1 or request.GET.get('AmountDue') == '' or request.GET.get('gallonsReq').isdigit()==False:
+        if request.GET.get('AmountDue') == '' :
+            messages.info(request, 'Amount due can not be none')
+            print("Debug")
+            return render(request, "FuelQuote.html")  
+              
+        else:
+            AmountDue= request.GET['AmountDue'] 
+
+
+        if request.GET.get('gallonsReq') == '' :
+            messages.info(request, 'Gallons requested can not be none')
+            print("Debug")
+            return render(request, "FuelQuote.html")
+      
+        elif int(request.GET.get('gallonsReq'))<1 or request.GET.get('gallonsReq').isdigit()==False:
             messages.info(request, 'Gallons requested must be an integer')
             print("Debug")
             return render(request, "FuelQuote.html")
