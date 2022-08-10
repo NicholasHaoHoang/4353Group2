@@ -218,13 +218,13 @@ class TestViews(TestCase):
     def test_signup_post(self):
         #password not match case
         response = self.client.post(self.signup_url, {
-            'email': 'test@email.com',
-            'confirmemail':'test@email.com',
+            'email': 'test1@email.com',
+            'confirmemail':'test1@email.com',
             'name': 'test',
             'password': 'secret',
             'confirmpassword': 'secret1'
         })
-        #password & email match case
+        #Existing account case
         response = self.client.post(self.signup_url, {
             'email': 'test@email.com',
             'confirmemail':'test@email.com',
@@ -236,6 +236,13 @@ class TestViews(TestCase):
         response = self.client.post(self.signup_url, {
             'email': 'test1@email.com',
             'confirmemail':'test@email.com',
+            'name': 'test',
+            'password': 'secret',
+            'confirmpassword': 'secret'
+        })
+        response = self.client.post(self.signup_url, {
+            'email': 'test11@email.com',
+            'confirmemail':'test11@email.com',
             'name': 'test',
             'password': 'secret',
             'confirmpassword': 'secret'
