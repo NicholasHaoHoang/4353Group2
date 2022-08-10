@@ -56,12 +56,7 @@ def fuelQuote(request):
             price = round(price,2)
             print(f"Price: {price}")
         else:
-            gallons = 1
-            print(f"No gallons found, Calculating with {gallons} gallons")
-            priceMod = PricingModule(request.user,gallons)
-            price = priceMod.calculate()
-            price = round(price,2)
-            print(f"Price: {price}")
+            return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'enterprice':"Enter values to get your price",'Amount':0})
         return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'Price':price,'Amount':0})
 
     return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'enterprice':"Enter values to get your price",'Amount':0})
@@ -107,24 +102,13 @@ def signup(request):
         confirmpassword = request.POST.get('confirm_password')
 
         if (email == confirmemail) and (confirmpassword == password):
-            if User.objects.filter(email=email).exists():
+            if User.objects.filter(username=email).exists():
                 messages.info(request, 'Email Already Used')
-                return redirect('Signup.html')
-            elif User.objects.filter(username = name).exists():
-                messages.info(request, 'Name Already Exists')
                 return redirect('Signup.html')
             else:
                 user = User.objects.create_user(username = email, email = email, password = password)
-                print(user)
-                if user:
-                    Profile.objects.create(email=email)
-                else:
-                    user=User.objects.filter(username=email,email=email)
-                    print(user)
-                    User.delete()
-                    messages.info(request, 'Could not create the account')
-                    return redirect('Signup.html')
                 user.save()
+                messages.info(request, "Account successfully created, please Login now")
                 return redirect('login.html')
         else:
             if not(confirmpassword == password):
@@ -226,7 +210,7 @@ def getQuote(request):
             month,day,year=deliverydate.split('-')
             datetime.datetime(int(month),int(day),int(year))
 
-        except ValueError:
+        except:
             isValid=False
 
         if isValid==False:
@@ -268,12 +252,13 @@ def confirmQuote(request):
         else:
             gallonsReq=round(float(request.GET.get('gallonsReq')),2)
 
-        month,day,year=deliverydate.split('-')
+        
         isValid=True
         try:
+            month,day,year=deliverydate.split('-')
             datetime.datetime(int(month),int(day),int(year))
 
-        except ValueError:
+        except:
             isValid=False
 
         if isValid==False:
@@ -314,7 +299,8 @@ class PricingModule:
         self.user = user
 
     def states_factor(self):
-        cur_profile = Profile.objects.filter(email = self.user.email)
+        cur_profile = Profile.objects.filter(email=self.user)
+        print(f"States Factor User: {self.user}")
         if cur_profile[0].state == 'TX':
             return 0.02
         else:

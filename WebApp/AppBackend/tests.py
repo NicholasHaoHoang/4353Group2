@@ -110,24 +110,37 @@ class URLTests(TestCase):
 
 class testPricingModule(TestCase):
     def setUp(self):
-        self.testuser=User.objects.create_user(username= 'dummy', password='test')
-        self.testProf = Profile( name = "test", email = "t@email.com", address1 = "1 street", city = "houston", state ="TX", zipcode="77777")
-        self.pm = PricingModule(self.testuser,11)
+        self.testUser = User.objects.create_user(username= 't@email.com', password='secret')
+        self.testUser.set_password('secret')
+        self.testUser.save()
+
+        self.testProfile = Profile.objects.create(
+            name = 't@email.com',
+            email = 't@email.com',
+            address1 = '1 test street',
+            address2 =  'apt 1',
+            city = 'TestCity',
+            state = 'TX',
+            zipcode = '11111',
+        )
+        self.pm = PricingModule(self.testUser,'11')
         self.pm.user.state = 'LA'
         self.pm.user.gallonsReq = 11
         self.pm.user.current_price = 11
+        self.client.login(username='t@email.com', password='secret')
+        
 
     def test_init(self):
-        self.pm.__init__(self.testuser,11)
+        self.pm.__init__(self.testUser,11)
         self.assertEqual(self.pm.current_price, 1.50)
         self.assertEqual(self.pm.gallonsReq, 11)
-        self.assertEqual(self.pm.user, self.testuser)
+        self.assertEqual(self.pm.user, self.testUser)
     
-    # def test_states_factor(self):
-    #     self.pm.user.state = 'TX'
-    #     self.assertEqual(0.02, self.pm.states_factor())
-    #     self.pm.user.state = 'AL'
-    #     self.assertEqual(0.04, self.pm.states_factor())
+    def test_states_factor(self):
+        self.pm.user.state = 'TX'
+        self.assertEqual(0.02, self.pm.states_factor())
+        Profile.objects.filter(email=self.testUser).update(state='AL')
+        self.assertEqual(0.04, self.pm.states_factor())
 
     def test_rate_history(self):
         ae = FuelQuote.objects.none()
@@ -151,30 +164,6 @@ class testPricingModule(TestCase):
         self.assertEqual(0.03, self.pm.gallonsReq_factor())
         self.pm.gallonsReq = 0
         self.assertEqual(0.04, self.pm.gallonsReq_factor())
-    
-    # def test_margin(self):
-    #     self.pm.user.state = 'AL' #location_factor should be 0.04
-    #     self.pm.current_price = 10
-    #     res = FuelQuote.objects.create(
-    #         email = 'test@email.com',
-    #         gallonsRequested = 1,
-    #         deliveryAddress = '1 street',
-    #         deliverydate ='1/1/2000',
-    #         price = 10,
-    #         AmountDue = 10
-    #     )#rate_history should be 0.01
-    #     self.pm.user.gallonsReq = 10 #gallonsReq_factor should be 0.04
-    #     margin = round((self.pm.current_price * (0.04 - 0.01 + 0.04 + 0.20)),3)
-    #     rounded_margin = round(margin,3)
-    #     self.assertEqual(rounded_margin,self.pm.margin())
-
-
-        
-
-    # def test_calculate(self):
-    #     self.pm.current_price = 2
-    #     self.pm.gallonsReq = 2
-    #     self.assertEqual(((self.pm.margin() + self.pm.current_price)),self.pm.calculate())
 
 
         
@@ -186,6 +175,7 @@ class TestViews(TestCase):
         self.signup_url = reverse('signup')
         self.confirmQuote_url = reverse('confirmQuote')
         self.getQuotes_url = reverse('getQuote')
+        self.fuelQuote_url = reverse('fuelQuote')
         self.profileManagementurl = reverse('ProfileManagement')
         self.credentials = {
             'username' : 'test@test.com',
@@ -238,9 +228,17 @@ class TestViews(TestCase):
             'confirmpassword': 'secret1'
         })
         #Existing account case
+        self.credentials = {
+            'username' : 'test',
+            'email' : 'test2@email.com',
+            'password' : 'secret',
+        }
+        self.testUser3 = User.objects.create_user(self.credentials)
+        self.testUser3.set_password('secret')
+        self.testUser3.save()
         response = self.client.post(self.signup_url, {
-            'email': 'test@email.com',
-            'confirmemail':'test@email.com',
+            'email': 'test2@email.com',
+            'confirmemail':'test2@email.com',
             'name': 'test',
             'password': 'secret',
             'confirmpassword': 'secret'
@@ -248,11 +246,13 @@ class TestViews(TestCase):
         #email not match case
         response = self.client.post(self.signup_url, {
             'email': 'test1@email.com',
-            'confirmemail':'test@email.com',
+            'confirmemail':'testfff@email.com',
             'name': 'test',
             'password': 'secret',
             'confirmpassword': 'secret'
         })
+
+        #correct case
         response = self.client.post(self.signup_url, {
             'email': 'test11@email.com',
             'confirmemail':'test11@email.com',
@@ -260,7 +260,6 @@ class TestViews(TestCase):
             'password': 'secret',
             'confirmpassword': 'secret'
         })
-        User.objects.create()
         self.assertEquals(response.status_code, 302)
 
     def test_profileManagement(self):
@@ -296,8 +295,17 @@ class TestViews(TestCase):
         print(f"Current User: {response.context['user']}")
 
 
-
-    def test_fuelQuote_get(self):
+    def test_confirmQuote_post(self):
+        self.client.login(username='test@test.com', password='secret')
+        response = self.client.get(self.confirmQuote_url, {
+            'gallonsReq': '100',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': '122'
+        })
+        self.assertEqual(response.status_code, 200)
+    def test_confirmQuote_get(self):
         #gallonsReq is null case
         self.client.login(username='test@test.com', password='secret')
         response = self.client.get(self.confirmQuote_url, {
@@ -316,18 +324,8 @@ class TestViews(TestCase):
             'price': '1.91',
             'AmountDue': ''
         })
-        print(response)
-       #No delivery date
-        response = self.client.post(self.confirmQuote_url, {
-            'gallonsReq': '10',
-            'deliveryAddress':'76771 abc 131',
-            'deliverydate': '',
-            'price': '1.91',
-            'AmountDue': ''
-        })
-        print(response)
         #gallons < 0
-        response = self.client.post(self.confirmQuote_url, {
+        response = self.client.get(self.confirmQuote_url, {
             'gallonsReq': '0',
             'deliveryAddress':'76771 abc 131',
             'deliverydate': '2022-08-17',
@@ -335,9 +333,18 @@ class TestViews(TestCase):
             'AmountDue': ''
         })
         print(response)
+        #No delivery date
+        response = self.client.get(self.confirmQuote_url, {
+            'gallonsReq': '10',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        
         #date format wrong
         response = self.client.post(self.confirmQuote_url, {
-            'gallonsReq': '0',
+            'gallonsReq': '100',
             'deliveryAddress':'76771 abc 131',
             'deliverydate': '2022-0817',
             'price': '1.91',
@@ -345,7 +352,7 @@ class TestViews(TestCase):
         })
         print(response)
         #correct case
-        response = self.client.post(self.confirmQuote_url, {
+        response = self.client.get(self.confirmQuote_url, {
             'gallonsReq': '10',
             'deliveryAddress':'76771 abc 131',
             'deliverydate': '2022-08-17',
@@ -355,8 +362,6 @@ class TestViews(TestCase):
         print(response)
         User.objects.create()
         self.assertEquals(response.status_code, 200)
-
-
     def test_getQuote_get(self):
         
         print("TESTING GET QUOTE\n")
@@ -406,6 +411,22 @@ class TestViews(TestCase):
             'price': '1.91',
             'AmountDue': ''
         })
-        
+    def test_fuelQuote_get(self):
+        self.testProfile = Profile.objects.create(
+            name = '',
+            email = 'test@test.com',
+            address1 = '',
+            address2 =  '',
+            city = '',
+            state = '',
+            zipcode = '',
+        )
+        dict = {
+            'gallonsReq':0
+        }
+        #login
+        self.client.login(username='test@test.com', password='secret')
+        #Test with empty Profile
+        response = self.client.get(self.fuelQuote_url)
 
 
