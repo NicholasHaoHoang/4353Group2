@@ -185,31 +185,35 @@ class TestViews(TestCase):
         self.signup_url = reverse('signup')
         self.confirmQuote_url = reverse('confirmQuote')
         self.getQuotes_url = reverse('getQuote')
-        self.testUser = User.objects.create(
-            username = 'test',
-            email = 'test@email.com',
-            password = 'secret'
+        self.profileManagementurl = reverse('ProfileManagement')
+        self.credentials = {
+            'username' : 'test@test.com',
+            'email' : 'test@test.com',
+            'password' : 'secret',
+        }
+        self.testUser = User.objects.create_user(**self.credentials)
+        self.testUser.set_password('secret')
+        self.testUser.save()
+        self.testProfile = Profile.objects.create(
+            name = 'testName',
+            email = 'test@test.com',
+            address1 = '1 test street',
+            address2 =  'apt 1',
+            city = 'TestCity',
+            state = 'TX',
+            zipcode = '11111',
         )
          
 
     def test_login_get(self):
-        testuser=User.objects.create_user(username= 'dummy', password='test')
         response = self.client.get(self.login_url)
         self.assertEquals(response.status_code,200)
         self.assertTemplateUsed(response, 'login.html')
     
     def test_login_post(self):
-
-        response = self.client.post(self.login_url, {
-            'email': 'test@email.com',
-            'username': 'test',
-            'password': 'secret'
-        })
-
-        self.assertEquals(response.status_code, 302)
-        self.assertEquals(self.testUser.username, 'test')
-        self.assertEquals(self.testUser.password, 'secret')
-        self.assertEquals(self.testUser.email, 'test@email.com')
+        response = self.client.post(self.login_url, self.credentials ,follow=True)
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue(self.client.login(username='test@test.com', password='secret'))
 
     def test_signup_post(self):
         #password not match case
@@ -239,6 +243,31 @@ class TestViews(TestCase):
         User.objects.create()
         self.assertEquals(response.status_code, 302)
 
+    def test_profileManagement(self):
+        print("TESTING PROFILE MANAGEMENT:\n")
+        #correct case
+        dict={  
+            'firstname' : 'testName',
+            'address1' : '1 test street',
+            'address2' : 'apt 1',
+            'state' : 'TX',
+            'city' : 'TestCity',
+            'email': 'test@test.com',
+            'zipcode' : '11111',
+        }
+        print(Profile.objects.all())
+
+        #Test without logging in
+        response = self.client.post(self.profileManagementurl,dict)
+        print(f"Current User: {response.context['user']}")
+        self.assertEquals(response.status_code, 200)
+
+        
+        #Test with login
+        loggedintest = self.client.login(username='test@test.com', password='secret')
+        response = self.client.post(self.profileManagementurl,dict)
+        print(f"Current User: {response.context['user']}")
+        #self.client.post(self.profileManagementurl,dict)
 
 
     def test_fuelQuote_get(self):

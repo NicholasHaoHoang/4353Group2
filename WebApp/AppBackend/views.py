@@ -138,7 +138,7 @@ def signup(request):
 #Rendering ProfileManagement.html
 def  ProfileManagement(request):
     if request.user.is_authenticated == False or request.user.is_superuser :
-        return render(request, '/')
+        return render(request, 'login.html')
         #Insert code for Profile Management here
     #current user, use in Assignment 4 to pull info
     current_user = request.user
