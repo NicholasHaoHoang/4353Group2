@@ -34,14 +34,17 @@ def  fuelHistory(request):
     return render(request, 'FuelHistory.html',{'data':data})
 
 #Rendering FuelQuote.html
-def  fuelQuote(request):
+def fuelQuote(request):
     #Insert code for Fuel Quote here
     print(f"In Fuel Quote: \nCurrentUser: {request.user}")
 
     if request.user.is_authenticated == False or request.user.is_superuser :
         return render(request, 'login.html')
-    #END CODE
+    
+
     profile = Profile.objects.filter(email=request.user)
+    if(profile.first().address1 == ''):
+        return render(request, 'ProfileManagement.html',{'message':'Please complete Profile Management before making a Quote'})
 
     address = profile[0].address1 +" " +profile[0].address2
     if(request.method == 'GET'):
@@ -64,7 +67,7 @@ def  fuelQuote(request):
     return render(request, 'FuelQuote.html',{'DeliveryAddress':address,'enterprice':"Enter values to get your price",'Amount':0})
 
 #Rendering login.html
-def  login(request):
+def login(request):
     #Insert code for login (login.html) here
     if request.method == 'POST':
         email = request.POST.get('email_address')
@@ -132,11 +135,8 @@ def signup(request):
     else:
         return render(request, 'Signup.html')  
     
-
-    
-
 #Rendering ProfileManagement.html
-def  ProfileManagement(request):
+def ProfileManagement(request):
     if request.user.is_authenticated == False or request.user.is_superuser :
         return render(request, 'login.html')
         #Insert code for Profile Management here
@@ -144,6 +144,9 @@ def  ProfileManagement(request):
     current_user = request.user
     if request.user.is_authenticated:
         profile = Profile.objects.filter(email=current_user)
+        if not profile.exists():
+                #Create blank Profile
+                Profile.objects.create(email = current_user)
         profile_dict ={
             "profile":profile[0]
         }
@@ -160,34 +163,17 @@ def  ProfileManagement(request):
         profile_dict["state"] = profile[0].state
         profile_dict["city"] = profile[0].city
         profile_dict["zipcode"] = profile[0].zipcode
+        print(f"Dictionary: {profile_dict}")
         if request.method == 'POST':
             print(f"POST METHOD: \nDictionary: {profile_dict}")
             prof = profile
-            if not profile.exists():
-                #Pull from Database, Implement this part in Assignment 4
-                prof = Profile.objects.create(email = current_user,name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
-                profile_dict['profile'] = prof
+            prof = Profile.objects.filter(email=current_user.email).update(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
+            profile_dict['profile'] = Profile.objects.filter(email=current_user).first()
+            if prof == 1:
                 message = "Data updated successfully, Make an order now"
-                profile_dict["message"] = message
             else:
-# <<<<<<< HEAD
-#                 prof = Profile.objects.update(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
-#                 print(prof)
-#                 if prof:
-#                     message = "Data updated successfully"
-#                 else:
-#                     message = "Data not updated successfully"
-#                 # profile_dict["profile"] = prof
-# =======
-                prof = Profile.objects.filter(email=current_user.email).update(name = name, address1 = address1, address2 = address2, city = city, state = state, zipcode = zipcode)
-                profile_dict['profile'] = Profile.objects.filter(email=current_user)
-                if prof == 1:
-                    message = "Data updated successfully, Make an order now"
-                else:
-                    message = "Data not updated successfully"
-                    return render(request,'ProfileManagement.html',profile_dict)
-# >>>>>>> b5e7a8e293e978a52a9a21bf4d83353b614f5d40
-                profile_dict["message"] = message
+                message = "Data not updated successfully"
+            profile_dict["message"] = message
             return fuelQuote(request)
          
         else:
@@ -204,34 +190,40 @@ def getQuote(request):
         gallonsReq=request.GET.get('gallonsReq')
         deliveryAddress=request.GET.get('deliveryAddress')
         deliverydate=request.GET.get('deliverydate')
-        priceMod = PricingModule(request.user,int(gallonsReq))
-        price = priceMod.calculate()
-        print(f"Price: {price}")
-        AmountDue=request.GET.get('AmountDue')
-        quote_dict={
-            "gallonsReq":gallonsReq,
-            "DeliveryAddress":deliveryAddress,
-            "deliverydate":deliverydate,
-            "Price":round(float(price),2),
-            "AmountDue":AmountDue
-        }
-        print(quote_dict)
-        
-        if  request.GET.get('gallonsReq') == '' :
+        quote_dict={}
+        quote_dict["gallonsReq"] = gallonsReq
+        quote_dict["DeliveryAddress"] = deliveryAddress
+        quote_dict["deliverydate"] = deliverydate
+        print(f"GetQuote Dictionary: {quote_dict}")
+        if gallonsReq == '' :
             quote_dict["message"]="Gallons requested can not be null"
             return render(request, "FuelQuote.html",quote_dict)
-        elif int(request.GET.get('gallonsReq'))<1 or request.GET.get('gallonsReq').isdigit()==False:
-            quote_dict["message"]="Gallons requested must be an integer"
+        elif (gallonsReq.isdigit()==False):
+            quote_dict["message"]="Gallons requested must be a number"
             return render(request, "FuelQuote.html",quote_dict)
         else:
-            gallonsReq=float(request.GET['gallonsReq'])
-            price = round(priceMod.calculate(),2)
-            AmountDue = float(gallonsReq)*float(price)
-            quote_dict["AmountDue"] = round(AmountDue,2)
+            gallonsReq=float(request.GET.get('gallonsReq'))
 
-        month,day,year=deliverydate.split('-')
+        #Create Pricing Module and calculate price/gallon
+        priceMod = PricingModule(request.user,int(gallonsReq))
+        price = priceMod.calculate()
+
+        #Multiply by gallonsReq to get Amount Due
+        AmountDue = float(gallonsReq)*float(price)
+        
+        #Add to dictionary
+        quote_dict["Price"] = round(float(price),2)
+        quote_dict["AmountDue"] = round(AmountDue,2)
+        
+        #debug, print dictionary
+        print(f"GetQuote Dictionary: {quote_dict}")
+        
+        
+
+        
         isValid=True
         try:
+            month,day,year=deliverydate.split('-')
             datetime.datetime(int(month),int(day),int(year))
 
         except ValueError:
@@ -239,25 +231,8 @@ def getQuote(request):
 
         if isValid==False:
             quote_dict["message"] = "Delivery date is not in correct format"
-            return render(request, quote_dict)
-            
-        
-        print(gallonsReq)
-        print(deliveryAddress)
-        print(deliverydate)
-        print(price)
-        print(AmountDue)
+            return render(request, "FuelQuote.html", quote_dict)
 
-
-
-        # res = FuelQuote.objects.create(
-        #     email = request.user,
-        #     gallonsRequested = gallonsReq,
-        #     deliveryAddress = deliveryAddress,
-        #     deliverydate =deliverydate,
-        #     price = float(price),
-        #     AmountDue = float(AmountDue)
-        # )
         return render(request, "FuelQuote.html",quote_dict)
     else:
         return render(request,"FuelQuote.html")
@@ -283,20 +258,15 @@ def confirmQuote(request):
             return render(request, "FuelQuote.html")  
               
         else:
-            AmountDue= request.GET['AmountDue'] 
+            AmountDue= request.GET.get('AmountDue')
 
 
         if request.GET.get('gallonsReq') == '' :
-            messages.info(request, 'Gallons requested can not be none')
-            print("Debug")
-            return render(request, "FuelQuote.html")
-      
-        elif request.GET.get('gallonsReq').isdigit()==False:
-            messages.info(request, 'Gallons requested must be an integer')
+            messages.info(request, 'Gallons requested can not be null')
             print("Debug")
             return render(request, "FuelQuote.html")
         else:
-            gallonsReq=float(request.GET['gallonsReq'])
+            gallonsReq=round(float(request.GET.get('gallonsReq')),2)
 
         month,day,year=deliverydate.split('-')
         isValid=True
@@ -308,7 +278,7 @@ def confirmQuote(request):
 
         if isValid==False:
             quote_dict["message"] = "Delivery date is not in correct format"
-            return render(request, quote_dict)
+            return render(request, "FuelQuote.html", quote_dict)
             
         
         print(gallonsReq)

@@ -1,3 +1,4 @@
+from ast import Delete
 from django.test import TestCase, Client
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -194,6 +195,16 @@ class TestViews(TestCase):
         self.testUser = User.objects.create_user(**self.credentials)
         self.testUser.set_password('secret')
         self.testUser.save()
+
+        self.credentials = {
+            'username' : 'dummy@dummy.com',
+            'email' : 'dummy@dummy.com',
+            'password' : 'secret',
+        }
+        self.testUser2 = User.objects.create_user(**self.credentials)
+        
+        self.testUser2.set_password('secret')
+        self.testUser2.save()
         self.testProfile = Profile.objects.create(
             name = 'testName',
             email = 'test@test.com',
@@ -203,7 +214,9 @@ class TestViews(TestCase):
             state = 'TX',
             zipcode = '11111',
         )
-         
+    
+    def tearDown(self):
+        pass
 
     def test_login_get(self):
         response = self.client.get(self.login_url)
@@ -271,14 +284,22 @@ class TestViews(TestCase):
 
         
         #Test with login
-        loggedintest = self.client.login(username='test@test.com', password='secret')
+        self.client.login(username='test@test.com', password='secret')
+        #Profile already exists case
         response = self.client.post(self.profileManagementurl,dict)
         print(f"Current User: {response.context['user']}")
-        #self.client.post(self.profileManagementurl,dict)
+
+        #Test with Profile non-existent
+        self.client.login(username='dummy@dummy.com', password='secret')
+        #Profile already exists case
+        response = self.client.post(self.profileManagementurl,dict)
+        print(f"Current User: {response.context['user']}")
+
 
 
     def test_fuelQuote_get(self):
-        #no galon
+        #gallonsReq is null case
+        self.client.login(username='test@test.com', password='secret')
         response = self.client.get(self.confirmQuote_url, {
             'gallonsReq': '',
             'deliveryAddress':'76771 abc 131',
@@ -286,16 +307,7 @@ class TestViews(TestCase):
             'price': '1.91',
             'AmountDue': '122'
         })
-        print(response)
-        #Gallon not integer
-        response = self.client.get(self.confirmQuote_url, {
-            'gallonsReq': 'a',
-            'deliveryAddress':'76771 abc 131',
-            'deliverydate': '2022-08-17',
-            'price': '1.91',
-            'AmountDue': '122'
-        })
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         #no AmountDue
         response = self.client.get(self.confirmQuote_url, {
             'gallonsReq': '10',
@@ -346,34 +358,46 @@ class TestViews(TestCase):
 
 
     def test_getQuote_get(self):
+        
+        print("TESTING GET QUOTE\n")
+        
+        self.client.login(username='test@test.com', password='secret')
+        #correct case
+        response = self.client.get(self.getQuotes_url, {
+            'gallonsReq': '100',
+            'deliveryAddress':'test1',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        print(f"Current User: {response.context['user']}")
+        self.assertEquals(response.status_code, 200)
+
         #no gallon req
-        try:
-            response = self.client.get(self.getQuotes_url, {
-                'gallonsReq': '',
-                'deliveryAddress':'76771 abc 131',
-                'deliverydate': '2022-08-17',
-                'price': '1.91',
-                'AmountDue': ''
-            })
-        except:
-            print("Exception no gallonsReq")
-       
+        response = self.client.get(self.getQuotes_url, {
+            'gallonsReq': '',
+            'deliveryAddress':'test2',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': ''
+        })
+        #gallons not digit
+        response = self.client.get(self.getQuotes_url, {
+            'gallonsReq': 'a',
+            'deliveryAddress':'76771 abc 131',
+            'deliverydate': '2022-08-17',
+            'price': '1.91',
+            'AmountDue': ''
+        })
         #No delivery date
-        response = self.client.post(self.getQuotes_url, {
+        response = self.client.get(self.getQuotes_url, {
             'gallonsReq': '10',
             'deliveryAddress':'76771 abc 131',
             'deliverydate': '',
             'price': '1.91',
             'AmountDue': ''
         })
-        #gallons < 0
-        response = self.client.post(self.getQuotes_url, {
-            'gallonsReq': '0',
-            'deliveryAddress':'76771 abc 131',
-            'deliverydate': '2022-08-17',
-            'price': '1.91',
-            'AmountDue': ''
-        })
+        
         #date format wrong
         response = self.client.post(self.getQuotes_url, {
             'gallonsReq': '0',
@@ -382,15 +406,6 @@ class TestViews(TestCase):
             'price': '1.91',
             'AmountDue': ''
         })
-        #correct case
-        response = self.client.post(self.getQuotes_url, {
-            'gallonsReq': '10',
-            'deliveryAddress':'76771 abc 131',
-            'deliverydate': '2022-08-17',
-            'price': '1.91',
-            'AmountDue': ''
-        })
-        User.objects.create()
-        self.assertEquals(response.status_code, 200)
+        
 
 
